@@ -35,112 +35,118 @@ mod_newCol_ui <- function(id) {
 #' Server logic for newCol module
 #'
 #' @import shinyFeedback
-mod_newCol_srv <- function(input, output, session, dat, colType) {
-  ns <- session$ns
+mod_newCol_srv <- function(id, dat, colType) {
+  moduleServer(id, function(input, output, session) {
 
-  # The reference variable available for selection depends on what type of
-  # variable is chosen.
-  output$ref_var_ui <- renderUI({
-    selectInput(
-      ns("reference_var"), "Reference Variable",
-      choices =
-        if(colType() == "Range Variable") {
-          names(dat()[sapply(dat(), is.numeric)])
-        } else {
-          names(dat())
-        }
-    )
-  })
+    ns <- session$ns
 
-  # create histogram of reference variable
-  output$var_hist <- renderPlot({
-    ggplot2::ggplot(dat(), ggplot2::aes_string(x = input$reference_var)) +
-      ggplot2::geom_histogram() +
-      ggplot2::xlab(glue::glue("n = {nrow(dat())}"))
-  }, height=200)
-
-  # validation for column name
-  observeEvent(input$var_name, {
-    if (nchar(input$var_name) >= 9) {
-      shinyFeedback::showFeedbackDanger(
-        inputId = "var_name",
-        text = "8 Character max"
+    # The reference variable available for selection depends on what type of
+    # variable is chosen.
+    output$ref_var_ui <- renderUI({
+      selectInput(
+        ns("reference_var"), "Reference Variable",
+        choices =
+          if(colType() == "Range Variable") {
+            names(dat()[sapply(dat(), is.numeric)])
+          } else {
+            names(dat())
+          }
       )
-    } else if (grepl("[[:punct:]]", input$var_name)) { # SAS var names can contain underscores...
-      shinyFeedback::showFeedbackDanger(
-        inputId = "var_name",
-        text = "Cannot contain special characters"
-      )
-    } else {
-      shinyFeedback::hideFeedback("var_name")
-    }
-  })
+    })
 
-  # validation for column label
-  observeEvent(input$var_label, {
-    if (nchar(input$var_label) > 40) {
-      shinyFeedback::showFeedbackDanger(
-        inputId = "var_label",
-        text = "40 Character max"
-      )
-    } else if (grepl("[[:punct:]]", input$var_label)) {
-      shinyFeedback::showFeedbackDanger(
-        inputId = "var_label",
-        text = "Cannot contain special characters"
-      )
-    } else {
-      shinyFeedback::hideFeedback("var_label")
-    }
-  })
+    # create histogram of reference variable
+    output$var_hist <- renderPlot({
+      req(input$reference_var, dat())
 
-  # labels for if-then conditional groups
-  conds <- reactive(paste0("cond",seq_len(input$numGroups)))
+      ggplot2::ggplot(dat(), ggplot2::aes_string(x = input$reference_var)) +
+        ggplot2::geom_histogram(bins = 30) +
+        ggplot2::xlab(glue::glue("n = {nrow(dat())}"))
 
-  # generate numerous UI's for new var's new groups (as needed)
-  observeEvent(c(input$numGroups, colType()), {
-    output$cond_uis <-
-      if (colType() != "Custom") {
-        renderUI(mod_range_conds_ui(ns("cond1")))
+    }, height=200)
+
+    # validation for column name
+    observeEvent(input$var_name, {
+      if (nchar(input$var_name) >= 9) {
+        shinyFeedback::showFeedbackDanger(
+          inputId = "var_name",
+          text = "8 Character max"
+        )
+      } else if (grepl("[[:punct:]]", input$var_name)) { # SAS var names can contain underscores...
+        shinyFeedback::showFeedbackDanger(
+          inputId = "var_name",
+          text = "Cannot contain special characters"
+        )
       } else {
-        renderUI( purrr::map(conds(), ~ mod_adv_conds_ui(ns(.x))))
+        shinyFeedback::hideFeedback("var_name")
       }
-  })
+    })
 
-  rv_cnts <- reactiveValues()
+    # validation for column label
+    observeEvent(input$var_label, {
+      if (nchar(input$var_label) > 40) {
+        shinyFeedback::showFeedbackDanger(
+          inputId = "var_label",
+          text = "40 Character max"
+        )
+      } else if (grepl("[[:punct:]]", input$var_label)) {
+        shinyFeedback::showFeedbackDanger(
+          inputId = "var_label",
+          text = "Cannot contain special characters"
+        )
+      } else {
+        shinyFeedback::hideFeedback("var_label")
+      }
+    })
 
-  # initialize reactive values to monitor how many
-  moduleExpr <- reactive({
-    req(input$numGroups)
-    if(colType() == "Range Variable") {
-        moduleExpr <- callModule(mod_range_conds_srv, "cond1",
-                                 dat = dat,
-                                 grp = reactive(input$numGroups),
-                                 response = reactive(input$reference_var),
-                                 else_group = reactive(input$incl_else),
-                                 else_name = reactive(default_val(input$elseName, else_ph_util)))
-    } else {
-      purrr::map(conds(), ~ callModule(mod_adv_conds_srv, .x, dat = dat, cnt = rv_cnts))
-    }
-  })
+    # labels for if-then conditional groups
+    conds <- reactive(paste0("cond",seq_len(input$numGroups)))
 
-  # construct a call based on inputs
-  expr_call <-reactive({
-    req(moduleExpr())
-    colname <- default_val(input$var_name, var_name_ph_util)
-    rlang::call2(
-      quote(dplyr::mutate),
-      !!colname := rlang::call2(
-        quote(dplyr::case_when),
-        !!!moduleExpr()
+    # generate numerous UI's for new var's new groups (as needed)
+    observeEvent(c(input$numGroups, colType()), {
+      output$cond_uis <-
+        if (colType() != "Custom") {
+          renderUI(mod_range_conds_ui(ns("cond1")))
+        } else {
+          renderUI( purrr::map(conds(), ~ mod_adv_conds_ui(ns(.x))))
+        }
+    })
+
+    rv_cnts <- reactiveValues()
+
+    # initialize reactive values to monitor how many
+    moduleExpr <- reactive({
+      req(input$numGroups)
+      if(colType() == "Range Variable") {
+          moduleExpr <- mod_range_conds_srv(id = "cond1",
+                                   dat = dat,
+                                   grp = reactive(input$numGroups),
+                                   response = reactive(input$reference_var),
+                                   else_group = reactive(input$incl_else),
+                                   else_name = reactive(default_val(input$elseName, else_ph_util)))
+      } else {
+        purrr::map(conds(), ~ mod_adv_conds_srv(id = .x, dat = dat, cnt = rv_cnts))
+      }
+    })
+
+    # construct a call based on inputs
+    expr_call <-reactive({
+      req(moduleExpr())
+      colname <- default_val(input$var_name, var_name_ph_util)
+      rlang::call2(
+        quote(dplyr::mutate),
+        !!colname := rlang::call2(
+          quote(dplyr::case_when),
+          !!!moduleExpr()
+        )
       )
-    )
-  })
+    })
 
-  # Not sure why, but when this is commented out, the cond UI will not display
-  observe({
-    req(expr_call())
-    force(expr_call())
-  })
+    # Not sure why, but when this is commented out, the cond UI will not display
+    observe({
+      req(expr_call())
+      force(expr_call())
+    })
 
-  return(current_mutate = expr_call())
+    return(current_mutate = expr_call())
+  })
 }
