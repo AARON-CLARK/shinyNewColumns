@@ -1,6 +1,6 @@
 
 library(shiny)
-
+options(shiny.fullstacktrace = TRUE)
 # UI
 ui <- fluidPage(
   includeCSS("style.css"),

@@ -119,16 +119,23 @@ mod_rangeConditions_srv <- function(id, dat, grp, response, else_group, else_nam
     # })
 
 
-
     # Determine how many rows have been accounted for.
     # if 'else' group is created, answer should be 100% coverage
     row_cov_n <- reactive({
-      sum(purrr::map2_int(low(), high(), ~ sum(dplyr::between(resp_vtr(),input[[.x]], input[[.y]]), na.rm = T) ))
+      req(resp_vtr())
+      sum(purrr::map2_int(low(), high(), function(.x, .y) {
+            req(input[[.x]], input[[.y]])
+            sum(dplyr::between(resp_vtr(),input[[.x]], input[[.y]]), na.rm = T)
+      }))
     })
-    row_cov_pct <- reactive({ round(100 * (row_cov_n() / nrow(dat())), 2) })
+    row_cov_pct <- reactive({
+      req(row_cov_n(), dat())
+      round(100 * (row_cov_n() / nrow(dat())), 2)
+      })
 
     # temporary output... just a place holder until we find a better way of displaying
     output$row_coverage_msg <- renderUI({
+      req(row_cov_pct())
       if(row_cov_pct() < 100 & else_group() == FALSE){
         HTML(glue::glue("Accounted for {row_cov_n()}/{nrow(dat())} patients ({row_cov_pct()}%) with ranges provided. Consider adding 'Else' Group."))
       }
