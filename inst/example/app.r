@@ -7,7 +7,7 @@ ui <- fluidPage(
   fluidPage(
     h1("shinyNewColumns", align = "center"),
     br(), br(),
-    mod_gatherCols_ui("gatherCols"), # place button
+    mod_launchModal_ui("launchModal"), # place button
     br(), br(),
     verbatimTextOutput("debug_expr"),
     wellPanel(dataTableOutput("debug_data"))
@@ -17,7 +17,7 @@ ui <- fluidPage(
 # Server
 server <- function(input, output) {
   data_joined <- reactiveValues( expr = "", data = iris )
-  callModule(mod_gatherCols_srv, "gatherCols", dat = data_joined)
+  callModule(mod_launchModal_srv, "launchModal", dat = data_joined)
   output$debug_expr <- renderPrint(data_joined$expr)
   output$debug_data <- renderDataTable(data_joined$data)
 }

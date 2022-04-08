@@ -1,5 +1,5 @@
 
-mod_adv_conds_ui <- function(id) {
+mod_advConditions_ui <- function(id) {
   ns <- NS(id)
   wellPanel(
     h4(strong(paste0("#",substr(id,stringr::str_locate(id, "cond")[2] + 1,nchar(id))," If:"))),
@@ -17,11 +17,11 @@ mod_adv_conds_ui <- function(id) {
   )
 }
 
-mod_adv_conds_srv <- function(input, output, session, dat, cnt) {
+mod_advConditions_srv <- function(input, output, session, dat, cnt) {
   ns <- session$ns
 
   cond_num <- reactive({
-    # find ns context. Example id <- "gatherCols-new-cond1"
+    # find ns context. Example id <- "launchModal-new-cond1"
     id <- as.character(session$ns(character()))
     # determine current condition in loop
     curr_cond <- substr(id,stringr::str_locate(id, "cond")[1],nchar(id))
