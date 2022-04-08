@@ -137,9 +137,9 @@ mod_range_conds_srv <- function(id, dat, grp, response, else_group, else_name) {
     # # Trying to disable addCol button when lacking patient coverage from child
     # # module, but failing
     # observe({
-    #   shinyjs::toggleState("gatherCols-addCol", condition = row_cov_pct() != 100) #"addCol"
-    #    if(row_cov_pct() != 100) {shinyjs::disable("gatherCols-addCol")
-    #    } else {shinyjs::enable("gatherCols-addCol")}
+    #   shinyjs::toggleState("launchModal-addCol", condition = row_cov_pct() != 100) #"addCol"
+    #    if(row_cov_pct() != 100) {shinyjs::disable("launchModal-addCol")
+    #    } else {shinyjs::enable("launchModal-addCol")}
     # })
 
     return(between_expr())

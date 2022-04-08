@@ -66,12 +66,7 @@ mod_newCol_srv <- function(id, dat, colType) {
 
     # validation for column name
     observeEvent(input$var_name, {
-      if (nchar(input$var_name) >= 9) {
-        shinyFeedback::showFeedbackDanger(
-          inputId = "var_name",
-          text = "8 Character max"
-        )
-      } else if (grepl("[[:punct:]]", input$var_name)) { # SAS var names can contain underscores...
+        if (grepl("[[:punct:]]", input$var_name)) { # SAS var names can contain underscores...
         shinyFeedback::showFeedbackDanger(
           inputId = "var_name",
           text = "Cannot contain special characters"

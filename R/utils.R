@@ -33,5 +33,5 @@ cntDecV <- Vectorize(function(x) {
 # define the placeholder for the "Else" Group here, as it is referenced in many
 # places
 else_ph_util <- "Other Group"
-var_name_ph_util <- "ColName"
-lab_name_ph_util <- "LabName"
+var_name_ph_util <- "ColName1"
+lab_name_ph_util <- "LabName1"
