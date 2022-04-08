@@ -3,6 +3,7 @@ mod_launchModal_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
     tags$head(tags$style("#new_col_modal .modal-dialog {width:1000px;}")),
+    # UI is just comprised of a button!
     actionButton(ns("createColBttn"),"Create Variable")
   )
 }
@@ -11,8 +12,13 @@ mod_launchModal_ui <- function(id) {
 mod_launchModal_srv <- function(id, dat) {
   moduleServer(id, function(input, output, session) {
 
-    ns <- session$ns
+    ns <- session$ns # get namespace context
 
+    # initiate reactive values (rv) object to keep track of dplyr mutate()
+    # expressions
+    rv <- reactiveValues(data = dat, expr = NULL, all_mutates = NULL)
+
+    # initialize modal
     observeEvent(input$createColBttn, {
 
       showModal(tags$div(id="new_col_modal", modalDialog(
@@ -27,58 +33,45 @@ mod_launchModal_srv <- function(id, dat) {
           actionButton(ns("addCol"),"Add Variable")
         ),
 
-        # Content of the Modal
+        # Fill Content of the Modal with the 'newCol' UI
         mod_newCol_ui(ns("new"))
 
       )))
     })
 
-    all_mutates <- reactiveValues()
 
 
-    # Why do we need both of these to work?
-    # How do we condense this code?
-
-    ##########################################
-    observeEvent(input$createColBttn, {
-       mod_newCol_srv(id = "new",
-                  dat = reactive(dat$data),
-                  colType = reactive(input$createColType)
-                  )
+    # run 'newCol' module upon 'Create Col' button click, passing data and col
+    # type. Module returns dplyr mutate expression(s)
+    observe({
+      input$createColBttn
+      rv$current_mutate <- mod_newCol_srv(id = "new",
+            dat = reactive(rv$data),
+            colType = reactive(input$createColType)
+            )
     })
 
-    # save the current mutate
-    current_mutate <- eventReactive(input$createColBttn, {
-      mod_newCol_srv(id = "new",
-                     dat = reactive(dat$data),
-                     colType = reactive(input$createColType)
-      )
-    })
-    ##########################################
 
-
-    expressions_and_data <- reactive({
-      if (length(all_mutates$mutate) == 0) return("")
-      list(
-        rlang::expr(dat$data),
-        all_mutates$mutate
-      )
-    })
-
-    new_dataset <- reactive({
-      if (length(all_mutates$mutate) == 0) return(dat$data)
-      rlang::flatten(expressions_and_data()) %>%
-          purrr::reduce(~rlang::expr(!!.x %>% !!.y)) %>%
-          eval()
-    })
-
+    # Upon clicking 'Add Variable' button in modal, combine and evaluate
+    # dplyr mutate statements in order to modify data
     observeEvent(input$addCol, {
-      all_mutates$mutate <- c(all_mutates$mutate, current_mutate())
-      dat$data <- new_dataset()
-      dat$expr <- expressions_and_data()
+      rv$all_mutates <- c(rv$all_mutates, rv$current_mutate)
+
+      # expressions to evaluate on data source
+      rv$expr<- list(
+        rlang::expr(rv$data),  # current data
+        rv$all_mutates         # current + other mutates
+      )
+
+      # Create the new data frame with mutate(s) applied
+      rv$data <- rlang::flatten(rv$expr) %>%
+        purrr::reduce(~rlang::expr(!!.x %>% !!.y)) %>%
+        eval()
+
       removeModal()
     })
 
 
+  return(list(data = reactive(rv$data), expr = reactive(rv$expr)))
   })
 }
