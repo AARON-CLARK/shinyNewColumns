@@ -100,9 +100,9 @@ mod_newCol_srv <- function(input, output, session, dat, colType) {
   observeEvent(c(input$numGroups, colType()), {
     output$cond_uis <-
       if (colType() != "Custom") {
-        renderUI(mod_range_conds_ui(ns("cond1")))
+        renderUI(mod_rangeConditions_ui(ns("cond1")))
       } else {
-        renderUI( purrr::map(conds(), ~ mod_adv_conds_ui(ns(.x))))
+        renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
       }
   })
 
@@ -112,14 +112,14 @@ mod_newCol_srv <- function(input, output, session, dat, colType) {
   moduleExpr <- reactive({
     req(input$numGroups)
     if(colType() == "Range Variable") {
-        moduleExpr <- callModule(mod_range_conds_srv, "cond1",
+        moduleExpr <- callModule(mod_rangeConditions_srv, "cond1",
                                  dat = dat,
                                  grp = reactive(input$numGroups),
                                  response = reactive(input$reference_var),
                                  else_group = reactive(input$incl_else),
                                  else_name = reactive(default_val(input$elseName, else_ph_util)))
     } else {
-      purrr::map(conds(), ~ callModule(mod_adv_conds_srv, .x, dat = dat, cnt = rv_cnts))
+      purrr::map(conds(), ~ callModule(mod_advConditions_srv, .x, dat = dat, cnt = rv_cnts))
     }
   })
 

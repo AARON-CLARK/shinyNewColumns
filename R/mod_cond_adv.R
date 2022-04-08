@@ -1,5 +1,5 @@
 
-mod_adv_conds_ui <- function(id) {
+mod_advConditions_ui <- function(id) {
   ns <- NS(id)
   wellPanel(
     h4(strong(paste0("#",substr(id,stringr::str_locate(id, "cond")[2] + 1,nchar(id))," If:"))),
@@ -17,7 +17,7 @@ mod_adv_conds_ui <- function(id) {
   )
 }
 
-mod_adv_conds_srv <- function(input, output, session, dat, cnt) {
+mod_advConditions_srv <- function(input, output, session, dat, cnt) {
   ns <- session$ns
 
   cond_num <- reactive({

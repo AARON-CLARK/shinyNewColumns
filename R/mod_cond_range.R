@@ -1,5 +1,5 @@
 
-mod_range_conds_ui <- function(id) {
+mod_rangeConditions_ui <- function(id) {
   ns <- NS(id)
   wellPanel(
     uiOutput(ns("casewhens")),
@@ -10,7 +10,7 @@ mod_range_conds_ui <- function(id) {
 }
 
 
-mod_range_conds_srv <- function(input, output, session, dat, grp, response, else_group, else_name) {
+mod_rangeConditions_srv <- function(input, output, session, dat, grp, response, else_group, else_name) {
   ns <- session$ns
 
   # return the response variable as a vector
