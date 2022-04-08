@@ -73,6 +73,7 @@ mod_newCol_srv <- function(id, dat, colType) {
         )
       } else {
         shinyFeedback::hideFeedback("var_name")
+
       }
     })
 

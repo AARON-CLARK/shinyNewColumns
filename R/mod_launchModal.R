@@ -7,6 +7,7 @@ mod_launchModal_ui <- function(id) {
   )
 }
 
+
 mod_launchModal_srv <- function(id, dat) {
   moduleServer(id, function(input, output, session) {
 
