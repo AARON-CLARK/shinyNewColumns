@@ -1,5 +1,5 @@
 
-mod_gatherCols_ui <- function(id) {
+mod_launchModal_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
     tags$head(tags$style("#new_col_modal .modal-dialog {width:1000px;}")),
@@ -7,7 +7,7 @@ mod_gatherCols_ui <- function(id) {
   )
 }
 
-mod_gatherCols_srv <- function(input, output, session, dat) {
+mod_launchModal_srv <- function(input, output, session, dat) {
   ns <- session$ns
 
   observeEvent(input$createColBttn, {
