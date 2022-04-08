@@ -16,10 +16,10 @@ mod_launchModal_srv <- function(id, dat) {
 
       showModal(tags$div(id="new_col_modal", modalDialog(
         title = div(style="width:100%;padding-top:10px;",
-                    column(6, div(style="font-weight:bold;padding-top:5px;text-align:right", "New Column Type:")),
-                    column(6, selectInput(ns("createColType"), NULL,
-                                          choices = c("Range Variable","Yes/No Flag", "Custom"),
-                                          selected="Range Variable"))
+          column(6, div(style="font-weight:bold;padding-top:5px;text-align:right", "New Column Type:")),
+          column(6, selectInput(ns("createColType"), NULL,
+                      choices = c("Range Variable","Yes/No Flag", "Custom"),
+                      selected="Range Variable"))
         ),
         footer = tagList(
           modalButton("Cancel"),
@@ -39,12 +39,12 @@ mod_launchModal_srv <- function(id, dat) {
     # How do we condense this code?
 
     ##########################################
-    # observeEvent(input$createColBttn, {
-    #    mod_newCol_srv(id = "new",
-    #               dat = reactive(dat$data),
-    #               colType = reactive(input$createColType)
-    #               )
-    # })
+    observeEvent(input$createColBttn, {
+       mod_newCol_srv(id = "new",
+                  dat = reactive(dat$data),
+                  colType = reactive(input$createColType)
+                  )
+    })
 
     # save the current mutate
     current_mutate <- eventReactive(input$createColBttn, {
