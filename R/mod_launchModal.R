@@ -46,14 +46,11 @@ mod_launchModal_srv <- function(id, dat) {
     # type. Module returns dplyr mutate expression(s)
     observe({
       input$createColBttn
-      newCol <- mod_newCol_srv(id = "new",
+      rv$current_mutate <- mod_newCol_srv(id = "new",
                      dat = reactive(rv$data),
                      colType = reactive(input$createColType)
       )
-      rv$current_mutate <- newCol()$current_mutate
-      print(paste("newCol()$allow_add():", newCol()$allow_add()))
-      if(newCol()$allow_add()) shinyjs::enable(ns("addCol")) else shinyjs::disable(ns("addCol"))
-    })
+     })
 
 
     # Upon clicking 'Add Variable' button in modal, combine and evaluate
