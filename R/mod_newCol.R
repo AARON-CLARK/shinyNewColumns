@@ -7,17 +7,17 @@ mod_newCol_ui <- function(id) {
     shinyFeedback::useShinyFeedback(),
     wellPanel(
       fluidRow(
-        column(3,
+        column(4,
                textInput(ns("var_name"),"New Variable Name", placeholder = var_name_ph_util), #placeholder
                textInput(ns("var_label"), "New Variable Label", placeholder = lab_name_ph_util),
                ),
-        column(5,
+        column(4,
                fluidRow(
-                 column(6,  uiOutput(ns("ref_var_ui"))),
+                 column(8,  uiOutput(ns("ref_var_ui"))),
                ),
                fluidRow(
-                 column(6, sliderInput(ns("numGroups"), "Number of conditions/ groups", 1, 10, 1)),
-                 column(6, br(), checkboxInput(ns("incl_else"), "Include an 'Else' group", value = FALSE))
+                 column(8, sliderInput(ns("numGroups"), "Number of conditions/ groups", 1, 10, 1)),
+                 column(4, br(), checkboxInput(ns("incl_else"), "Include an 'Else' group", value = FALSE))
                  ),
                ),
         column(4, plotOutput(ns("var_hist"), height=200))
