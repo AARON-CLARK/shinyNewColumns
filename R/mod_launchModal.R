@@ -2,6 +2,7 @@
 mod_launchModal_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
+    shinyjs::useShinyjs(),
     tags$head(tags$style("#new_col_modal .modal-dialog {width:1000px;}")),
     # UI is just comprised of a button!
     actionButton(ns("createColBttn"),"Create Variable")
@@ -45,10 +46,13 @@ mod_launchModal_srv <- function(id, dat) {
     # type. Module returns dplyr mutate expression(s)
     observe({
       input$createColBttn
-      rv$current_mutate <- mod_newCol_srv(id = "new",
-            dat = reactive(rv$data),
-            colType = reactive(input$createColType)
-            )
+      newCol <- mod_newCol_srv(id = "new",
+                     dat = reactive(rv$data),
+                     colType = reactive(input$createColType)
+      )
+      rv$current_mutate <- newCol()$current_mutate
+      print(paste("newCol()$allow_add():", newCol()$allow_add()))
+      if(newCol()$allow_add()) shinyjs::enable(ns("addCol")) else shinyjs::disable(ns("addCol"))
     })
 
 

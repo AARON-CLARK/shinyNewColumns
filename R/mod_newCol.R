@@ -37,6 +37,10 @@ mod_newCol_ui <- function(id) {
 mod_newCol_srv <- function(id, dat, colType) {
   moduleServer(id, function(input, output, session) {
 
+    # Initialize a reactiveValues object for enabling/ disabling addCol button
+    # in parent module
+    rv_newCol <- reactiveValues(addCol = TRUE)
+
     ns <- session$ns
 
     # The reference variable available for selection depends on what type of
@@ -68,27 +72,32 @@ mod_newCol_srv <- function(id, dat, colType) {
 
     }, height=200)
 
-    # validation for column name
+    # validation for column name, no punctuation except . or _ allowed.
+    # If violated, disable addCol button
+    var_name_punct <- reactive(grepl("([._])|[[:punct:]]", input$var_name))
     observeEvent(input$var_name, {
-        if (grepl("[[:punct:]]", input$var_name)) { # SAS var names can contain underscores...
+      if (var_name_punct()) {
         shinyFeedback::showFeedbackDanger(
           inputId = "var_name",
           text = "Cannot contain special characters"
         )
       } else {
         shinyFeedback::hideFeedback("var_name")
-
       }
     })
 
-    # validation for column label
+    # validation for column label, same punctation rules as above, but also
+    # impose a character max. If violated, then disable addCol button
+
+    var_lab_max <- reactive(nchar(input$var_label) > 40)
+    var_lab_punct <- reactive(grepl("([._])|[[:punct:]]", input$var_label))
     observeEvent(input$var_label, {
-      if (nchar(input$var_label) > 40) {
+      if (var_lab_max()) {
         shinyFeedback::showFeedbackDanger(
           inputId = "var_label",
           text = "40 Character max"
         )
-      } else if (grepl("[[:punct:]]", input$var_label)) {
+      } else if (var_lab_punct()) {
         shinyFeedback::showFeedbackDanger(
           inputId = "var_label",
           text = "Cannot contain special characters"
@@ -96,6 +105,18 @@ mod_newCol_srv <- function(id, dat, colType) {
       } else {
         shinyFeedback::hideFeedback("var_label")
       }
+    })
+
+    observe({
+      # enable / disable addCol button in parent module
+      rv_newCol$addCol <- !any(
+        var_name_punct(), # T
+        var_lab_max(), # T
+        var_lab_punct() # F
+      )
+    # test <- c(T, T, T)
+    # !any(test)
+    print(paste("rv_newCol$addCol:", rv_newCol$addCol))
     })
 
     # labels for if-then conditional groups
@@ -147,6 +168,12 @@ mod_newCol_srv <- function(id, dat, colType) {
       force(expr_call())
     })
 
-    return(current_mutate = expr_call())
+    return_list <- reactive({
+      list(current_mutate = expr_call(),
+           allow_add = reactive(rv_newCol$addCol))
+    })
+
+
+    return(return_list)
   })
 }
