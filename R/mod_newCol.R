@@ -42,17 +42,20 @@ mod_newCol_srv <- function(id, dat, colType) {
 
     # The reference variable available for selection depends on what type of
     # variable is chosen.
-    output$ref_var_ui <- renderUI({
-      selectInput(
-        ns("reference_var"), "Reference Variable",
-        choices =
-          if(colType() == "Range Variable") {
-            names(dat()[sapply(dat(), is.numeric)])
-          } else {
-            names(dat())
-          }
-      )
+    observeEvent(colType(), {
+      output$ref_var_ui <- renderUI({
+        selectInput(
+          ns("reference_var"), "Reference Variable",
+          choices =
+            if(colType() == "Range Variable") {
+              names(dat()[sapply(dat(), is.numeric)])
+            } else {
+              names(dat())
+            }
+        )
+      })
     })
+
 
     # create histogram of reference variable
     output$var_hist <- renderPlot({
