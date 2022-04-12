@@ -5,7 +5,7 @@ mod_launchModal_ui <- function(id) {
     shinyjs::useShinyjs(),
     tags$head(tags$style("#new_col_modal .modal-dialog {width:1000px;}")),
     # UI is just comprised of a button!
-    actionButton(ns("createColBttn"),"Create Variable")
+    actionButton(ns("createColBttn"),"Add New Column")
   )
 }
 
@@ -73,6 +73,6 @@ mod_launchModal_srv <- function(id, dat) {
     })
 
 
-  return(list(data = reactive(rv$data), expr = reactive(rv$expr)))
+  return(list(data = reactive(rv$data), expr = reactive(rv$all_mutates)))
   })
 }
