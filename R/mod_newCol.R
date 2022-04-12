@@ -4,20 +4,19 @@
 mod_newCol_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
+    shinyFeedback::useShinyFeedback(),
     wellPanel(
       fluidRow(
-        column(4,
-               shinyFeedback::useShinyFeedback(),
-               textInput(ns("var_name"),"Variable Name", placeholder = var_name_ph_util), #placeholder
-               textInput(ns("var_label"), "Variable Label", placeholder = lab_name_ph_util),
+        column(3,
+               textInput(ns("var_name"),"New Variable Name", placeholder = var_name_ph_util), #placeholder
+               textInput(ns("var_label"), "New Variable Label", placeholder = lab_name_ph_util),
                ),
-        column(4,
+        column(5,
                fluidRow(
                  column(6,  uiOutput(ns("ref_var_ui"))),
-                 # column(6,  tags$div(style="padding-top:20px", checkboxInput(ns("live"), "Use Live Data?", value = TRUE))),
                ),
                fluidRow(
-                 column(6, sliderInput(ns("numGroups"), "Number of groups", 1, 10, 1)),
+                 column(6, sliderInput(ns("numGroups"), "Number of conditions/ groups", 1, 10, 1)),
                  column(6, br(), checkboxInput(ns("incl_else"), "Include an 'Else' group", value = FALSE))
                  ),
                ),
@@ -41,7 +40,8 @@ mod_newCol_srv <- function(id, dat, colType) {
     ns <- session$ns
 
     # The reference variable available for selection depends on what type of
-    # variable is chosen.
+    # 'New Column Type' is chosen. For Ex, a "Range Variable" can only be
+    # built on the data's numeric variables
     observeEvent(colType(), {
       output$ref_var_ui <- renderUI({
         selectInput(
