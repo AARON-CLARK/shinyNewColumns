@@ -45,14 +45,15 @@ mod_newCol_srv <- function(id, dat, colType) {
     observeEvent(colType(), {
       output$ref_var_ui <- renderUI({
         selectInput(
-          ns("reference_var"), "Reference Variable",
-          choices =
-            if(colType() == "Range Variable") {
-              names(dat()[sapply(dat(), is.numeric)])
-            } else {
-              names(dat())
-            }
-        )
+          ns("reference_var"),
+          label = switch(colType(),
+                         Custom = "Plot Variable Distribution",
+                         "Reference Variable"),
+          choices = switch(colType(),
+                      `Range Variable` = names(dat()[sapply(dat(), is.numeric)]),
+                      names(dat()) ),
+          selected = isolate(input$reference_var)
+          )
       })
     })
 
