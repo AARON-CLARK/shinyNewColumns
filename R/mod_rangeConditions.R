@@ -10,15 +10,15 @@ mod_rangeConditions_ui <- function(id) {
 }
 
 
-mod_rangeConditions_srv <- function(id, dat, grp, response, else_group, else_name) {
+mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, else_name) {
   moduleServer(id, function(input, output, session) {
 
     ns <- session$ns
 
-    # return the response variable as a vector
-    resp_vtr <- reactive({
-      req(!is.null(response()))
-      dat()[,response()]
+    # return the reference_var as a vector
+    ref_vtr <- reactive({
+      req(!is.null(reference_var()))
+      dat()[,reference_var()]
     })
 
     # "step" is an argument for numericInput and determines the number of decimal
@@ -26,14 +26,14 @@ mod_rangeConditions_srv <- function(id, dat, grp, response, else_group, else_nam
     # inclusive on the low and high side, so if the column is full of integers, we
     # this arg to 1, else it has to be one more decimal past what exists in the data
     resp_step <- reactive({
-      req(!is.null(response()))
-      if(is.integer(resp_vtr())){ 1 } else { 10 ^ -(max(cntDecV(resp_vtr())) + 1) }
+      req(!is.null(reference_var()))
+      if(is.integer(ref_vtr())){ 1 } else { 10 ^ -(max(cntDecV(ref_vtr())) + 1) }
     })
 
     # For ease of use, create somewhat equally spaced factor levels to split data
     # resp_lvl <- reactive({
-    #   req(resp_vtr())
-    #   lvls <- levels(ggplot2::cut_number(resp_vtr(), if(else_group()) grp() + 1 else grp()))[1:grp()]
+    #   req(ref_vtr())
+    #   lvls <- levels(ggplot2::cut_number(ref_vtr(), if(else_group()) grp() + 1 else grp()))[1:grp()]
     #   l <- as.numeric(substr(lvls,2,stringr::str_locate(lvls,",")[1]-1))
     #   u <- as.numeric(substr(lvls,stringr::str_locate(lvls,",")[1] + 1, nchar(lvls) - 1))
     #   return(list(lowBound = l, upBound = u))
@@ -51,10 +51,10 @@ mod_rangeConditions_srv <- function(id, dat, grp, response, else_group, else_nam
 
     output$casewhens <- renderUI({
       fluidRow(
-        column(3, purrr::map(low(), ~ tags$div(class = "add_padding", glue::glue("When {response()} is between")))),
-        column(1, purrr::map(low(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% min(resp_vtr(), na.rm = T), step = resp_step()) )),
+        column(3, purrr::map(low(), ~ tags$div(class = "add_padding", glue::glue("When {reference_var()} is between")))),
+        column(1, purrr::map(low(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% min(ref_vtr(), na.rm = T), step = resp_step()) )),
         column(1, purrr::map(low(), ~ tags$div(class = "add_padding", "and"))),
-        column(1, purrr::map(high(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% max(resp_vtr(), na.rm = T), step = resp_step()) )),
+        column(1, purrr::map(high(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% max(ref_vtr(), na.rm = T), step = resp_step()) )),
         column(2, purrr::map(high(), ~ tags$div(class = "add_padding", "the value will be"))),
         column(2, purrr::map2(then_names(), grp_placeholders(), ~  textInput(ns(.x), NULL, value = isolate(input[[.x]]), placeholder = .y) )),
         column(1, purrr::map2(then_names(),  grp_placeholders(), ~ tags$div(class = "add_padding red", glue::glue("{newCol_n()$cnts[newCol_n()$newCol == default_val(isolate(input[[.x]]), .y)]}/{nrow(dat())}"))))
@@ -72,14 +72,14 @@ mod_rangeConditions_srv <- function(id, dat, grp, response, else_group, else_nam
     between_expr <- reactive({
 
       temp <- purrr::pmap(
-        list("between", response(), range_low(), range_high(), range_names()),
+        list("between", reference_var(), range_low(), range_high(), range_names()),
         build_case_when_formula)
 
       if (else_group()) append(temp, rlang::expr(TRUE ~ !!else_name())) else  append(temp, rlang::expr(TRUE ~ "NA"))
     })
 
 
-    baby_expr_call <-reactive({
+    mutate_expr_call <-reactive({
       colname <- "newCol"
       rlang::call2(
         quote(dplyr::mutate),
@@ -91,25 +91,26 @@ mod_rangeConditions_srv <- function(id, dat, grp, response, else_group, else_nam
     })
 
     # The mega list
-    test <- reactive({
+    all_expressions <- reactive({
       list(
         rlang::expr(dat()),
-        rlang::expr(dplyr::select(response())),
-        baby_expr_call()
+        rlang::expr(dplyr::select(reference_var())),
+        mutate_expr_call()
       )
     })
 
-    # Create the new column and group by it so we have accurate row (patient)
+    # Create the new column and group by it so we have accurate row
     # counts to display next to each condition
-    mutate_dat <- reactive({
+    mutated_dat <- reactive({
       !any(is.na(range_names()))
-      test() %>%
+      all_expressions() %>%
         purrr::reduce(~ rlang::expr(!!.x %>% !!.y)) %>%
         eval()
     })
 
+    # calculate row counts
     newCol_n <- reactive({
-      mutate_dat() %>%
+      mutated_dat() %>%
         dplyr::group_by(newCol) %>%
         dplyr::summarize(cnts = dplyr::n())
     })
@@ -122,10 +123,10 @@ mod_rangeConditions_srv <- function(id, dat, grp, response, else_group, else_nam
     # Determine how many rows have been accounted for.
     # if 'else' group is created, answer should be 100% coverage
     row_cov_n <- reactive({
-      req(resp_vtr())
+      req(ref_vtr())
       sum(purrr::map2_int(low(), high(), function(.x, .y) {
             req(input[[.x]], input[[.y]])
-            sum(dplyr::between(resp_vtr(),input[[.x]], input[[.y]]), na.rm = T)
+            sum(dplyr::between(ref_vtr(),input[[.x]], input[[.y]]), na.rm = T)
       }))
     })
     row_cov_pct <- reactive({

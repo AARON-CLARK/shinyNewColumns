@@ -117,12 +117,13 @@ mod_newCol_srv <- function(id, dat, colType) {
     moduleExpr <- reactive({
       req(input$numGroups)
       if(colType() == "Range Variable") {
-          moduleExpr <- mod_rangeConditions_srv(id = "cond1",
-                                   dat = dat,
-                                   grp = reactive(input$numGroups),
-                                   response = reactive(input$reference_var),
-                                   else_group = reactive(input$incl_else),
-                                   else_name = reactive(default_val(input$elseName, else_ph_util)))
+          mod_rangeConditions_srv(
+             id = "cond1",
+             dat = dat,
+             grp = reactive(input$numGroups),
+             reference_var = reactive(input$reference_var),
+             else_group = reactive(input$incl_else),
+             else_name = reactive(default_val(input$elseName, else_ph_util)))
       } else {
         purrr::map(conds(), ~ mod_advConditions_srv(id = .x, dat = dat, cnt = rv_cnts))
       }
