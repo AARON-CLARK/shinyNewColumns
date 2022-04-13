@@ -1,5 +1,5 @@
 
-mod_launchModal_ui <- function(id) {
+mod_launchSNC_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
     shinyjs::useShinyjs(),
@@ -10,7 +10,7 @@ mod_launchModal_ui <- function(id) {
 }
 
 
-mod_launchModal_srv <- function(id, dat) {
+mod_launchSNC_srv <- function(id, dat) {
   moduleServer(id, function(input, output, session) {
 
     ns <- session$ns # get namespace context
