@@ -1,6 +1,6 @@
 #' User interface for newCol module
 #'
-#' Provides the interface for user to imput important characteristics about new
+#' Provides the interface for user to input important characteristics about new
 #' column the wish to create.
 #'
 #' @return a shiny \code{\link[shiny]{tagList}} containing a well panel of input

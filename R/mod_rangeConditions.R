@@ -1,4 +1,15 @@
-
+#' User interface for rangeConditions module
+#'
+#' Provides the interface for user to input important characteristics about new
+#' column the wish to create.
+#'
+#' @return a shiny \code{\link[shiny]{tagList}} containing a well panel of input
+#'   widgets
+#'
+#' @param id standard parameter for {shiny modules}.
+#'
+#' @import shiny
+#'
 mod_rangeConditions_ui <- function(id) {
   ns <- NS(id)
   wellPanel(
@@ -9,7 +20,18 @@ mod_rangeConditions_ui <- function(id) {
   )
 }
 
-
+#' Server logic for rangeConditions module
+#'
+#'
+#' @return an expression containing the `dplyr::between()` expressions used to
+#'   create new column
+#'
+#' @import shiny
+#' @importFrom purrr map map2 reduce pmap
+#' @importFrom rlang call2 expr
+#' @importFrom glue glue
+#' @importFrom dplyr between mutate case_when group_by summarize select
+#'
 mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, else_name) {
   moduleServer(id, function(input, output, session) {
 
