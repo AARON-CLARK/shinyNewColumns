@@ -1,10 +1,14 @@
 
 library(shiny)
-options(shiny.fullstacktrace = TRUE)
+options(shiny.fullstacktrace = FALSE)
+
 # UI
 ui <- fluidPage(
-  includeCSS("style.css"),
-  h1("shinyNewColumns" , align = "center"),
+  includeCSS("www/style.css"),
+  title = "shinyNewColumns",
+  h1(div(img(src="shinyNewColumnsv7_flat_wYellowStars.png",
+             style=" padding-left:3px; height:100px;"),
+         "shinyNewColumns"), align = "center"),
   br(), br(),
   # just a button next...
   fluidRow(column(12, align = "center", mod_launchModal_ui("snc"))),
