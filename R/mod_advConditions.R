@@ -1,4 +1,15 @@
-
+#' User interface for advConditions module
+#'
+#' Provides the interface for user to input important characteristics about new
+#' column the wish to create.
+#'
+#' @return a shiny \code{\link[shiny]{tagList}} containing a well panels of input
+#'   widgets
+#'
+#' @param id standard parameter for {shiny modules}.
+#'
+#' @import shiny
+#'
 mod_advConditions_ui <- function(id) {
   ns <- NS(id)
   wellPanel(
@@ -17,6 +28,18 @@ mod_advConditions_ui <- function(id) {
   )
 }
 
+#' Server logic for advConditions module
+#'
+#'
+#' @return nothing at the moment
+#'
+#' @import shiny
+#' @importFrom purrr map map2 pmap
+#' @importFrom rlang call2 expr
+#' @importFrom glue glue
+#' @importFrom dplyr between mutate case_when group_by summarize select
+#' @importFrom stringr str_locate
+#'
 mod_advConditions_srv <- function(id, dat, cnt) {
   moduleServer(id, function(input, output, session) {
 
@@ -77,16 +100,19 @@ mod_advConditions_srv <- function(id, dat, cnt) {
               if(all(sapply(dat()[input[[.y]]], is.numeric))) {
                 div(style = "padding-bottom:5px;",
                     numericInput(ns(.x), NULL, value = isolate(input[[.x]])) )
-              } else { # Variable is not numeric
+              } else {
+                # Variable is not numeric
                 # if operator is Contains or Doesn't Contain, user can enter free text
                 if(input[[.z]] %in% c("CONTAINS", "DOESN'T CONTAIN")){
                   div(style = "padding-bottom:5px;",
                       textInput(ns(.x), NULL, value = isolate(input[[.x]])) )
-                } else { # operator is not contains
+                } else {
+                  # operator is not contains
                   if(input[[.z]] %in% c("=", "!=")){ # looking for single value
                     selectInput(ns(.x), NULL, choices = unique(dat()[input[[.y]]]),
                                 selected = isolate(input[[.x]]))
-                  } else { # user can specify multiple values (operator is "in" or "not in")
+                  } else {
+                    # user can specify multiple values (operator is "in" or "not in")
                     selectInput(ns(.x), NULL, choices = unique(dat()[input[[.y]]]),
                                 selected = isolate(input[[.x]]), multiple = TRUE)
                   }
