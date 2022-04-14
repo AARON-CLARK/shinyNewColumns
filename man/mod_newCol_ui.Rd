@@ -6,6 +6,14 @@
 \usage{
 mod_newCol_ui(id)
 }
+\arguments{
+\item{id}{standard parameter for {shiny modules}.}
+}
+\value{
+a shiny \code{\link[shiny]{tagList}} containing a well panel of input
+  widgets
+}
 \description{
-User interface for newCol module
+Provides the interface for user to imput important characteristics about new
+column the wish to create.
 }

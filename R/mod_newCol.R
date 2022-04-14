@@ -1,6 +1,17 @@
 #' User interface for newCol module
 #'
-#' @import shinyFeedback
+#' Provides the interface for user to imput important characteristics about new
+#' column the wish to create.
+#'
+#' @return a shiny \code{\link[shiny]{tagList}} containing a well panel of input
+#'   widgets
+#'
+#' @param id standard parameter for {shiny modules}.
+#'
+#' @import shiny
+#' @importFrom shinyFeedback useShinyFeedback
+#'
+#'
 mod_newCol_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
@@ -33,7 +44,23 @@ mod_newCol_ui <- function(id) {
 
 #' Server logic for newCol module
 #'
-#' @import shinyFeedback
+#'
+#' @param id standard parameter for {shiny modules} used to create namespaces
+#'   and connect the UI module to the server module.
+#' @param dat a r data.frame you want users to derive a new column from and to.
+#' @param colType a text string, specifying a supported column type such as
+#'   "Range Variable"
+#'
+#' @return an exprression containing the `dplyr::mutate()` expressions used to
+#'   create new column
+#'
+#' @import shiny
+#' @importFrom shinyFeedback showFeedbackDanger hideFeedback
+#' @importFrom ggplot2 ggplot aes_string geom_histogram xlab
+#' @importFrom purrr map
+#' @importFrom rlang call2
+#' @importFrom dplyr mutate case_when
+#'
 mod_newCol_srv <- function(id, dat, colType) {
   moduleServer(id, function(input, output, session) {
 

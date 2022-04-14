@@ -4,7 +4,20 @@
 \alias{mod_newCol_srv}
 \title{Server logic for newCol module}
 \usage{
-mod_newCol_srv(input, output, session, dat, colType)
+mod_newCol_srv(id, dat, colType)
+}
+\arguments{
+\item{id}{standard parameter for {shiny modules} used to create namespaces
+and connect the UI module to the server module.}
+
+\item{dat}{a r data.frame you want users to derive a new column from and to.}
+
+\item{colType}{a text string, specifying a supported column type such as
+"Range Variable"}
+}
+\value{
+an exprression containing the `dplyr::mutate()` expressions used to
+  create new column
 }
 \description{
 Server logic for newCol module

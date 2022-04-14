@@ -1,7 +1,6 @@
 #' launchModal UI Function
 #'
-#' provides the interface for uploading ADSL data and a table overview of the
-#' uploaded file
+#' provides the interface to a single button
 #'
 #' @return a shiny \code{\link[shiny]{tagList}} containing a simple action
 #'   button to launch the `shinyNewColumns` modal
@@ -29,7 +28,7 @@ mod_launchModal_ui <- function(id) {
 #'
 #' @param id standard parameter for {shiny modules} used to create namespaces
 #'   and connect the UI module to the server module.
-#' @param dat a r data.frame you want users to
+#' @param dat a r data.frame you want users to  derive a new column from and to.
 #'
 #' @return a list of reactive objects. The first object is the original
 #'   data.frame in a reactive state (named `data()`), which may contain a newly
