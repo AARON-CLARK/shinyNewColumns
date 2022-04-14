@@ -5,7 +5,7 @@ options(shiny.fullstacktrace = FALSE)
 
 # UI
 ui <- fluidPage(
-  # includeCSS("www/style.css"),
+  includeCSS("www/style.css"),
   title = "shinyNewColumns",
   h1(div(img(src="shinyNewColumnsv7_flat_wYellowStars.png",
              style=" padding-left:3px; height:100px;"),
