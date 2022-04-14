@@ -83,10 +83,7 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
       colname <- "newCol"
       rlang::call2(
         quote(dplyr::mutate),
-        !!colname := rlang::call2(
-          quote(dplyr::case_when),
-          !!!between_expr()
-        )
+        !!colname := rlang::call2(quote(dplyr::case_when),!!!between_expr())
       )
     })
 
