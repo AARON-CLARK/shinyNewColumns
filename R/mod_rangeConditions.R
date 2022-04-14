@@ -42,24 +42,27 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
     # idea?
     # create casewhens_reset to set min & max values to new values whenever reference variable changes
 
-    # create casewhen ui
+
+    # create several vectors of text strings that will be used as
+    # UI id's that have the same length as there are groups
     grp_seq <- reactive(paste0(seq_len(grp())))
     low <- reactive(paste0("low", seq_len(grp())))
     high <- reactive(paste0("high", seq_len(grp())))
     then_names <- reactive(paste0("then", seq_len(grp())))
     grp_placeholders <- reactive(paste("Group", seq_len(grp())))
 
-    output$casewhens <- renderUI({
-      fluidRow(
-        column(3, purrr::map(low(), ~ tags$div(class = "add_padding", glue::glue("When {reference_var()} is between")))),
-        column(1, purrr::map(low(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% min(ref_vtr(), na.rm = T), step = resp_step()) )),
-        column(1, purrr::map(low(), ~ tags$div(class = "add_padding", "and"))),
-        column(1, purrr::map(high(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% max(ref_vtr(), na.rm = T), step = resp_step()) )),
-        column(2, purrr::map(high(), ~ tags$div(class = "add_padding", "the value will be"))),
-        column(2, purrr::map2(then_names(), grp_placeholders(), ~  textInput(ns(.x), NULL, value = isolate(input[[.x]]), placeholder = .y) )),
-        column(1, purrr::map2(then_names(),  grp_placeholders(), ~ tags$div(class = "add_padding red", glue::glue("{newCol_n()$cnts[newCol_n()$newCol == default_val(isolate(input[[.x]]), .y)]}/{nrow(dat())}"))))
-      )
-    })
+
+  output$casewhens <- renderUI({
+    fluidRow(
+      column(3, purrr::map(low(), ~ tags$div(class = "add_padding", glue::glue("When {reference_var()} is between")))),
+      column(1, purrr::map(low(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% min(ref_vtr(), na.rm = T), step = resp_step()) )),
+      column(1, purrr::map(low(), ~ tags$div(class = "add_padding", "and"))),
+      column(1, purrr::map(high(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% max(ref_vtr(), na.rm = T), step = resp_step()) )),
+      column(2, purrr::map(high(), ~ tags$div(class = "add_padding", "the value will be"))),
+      column(2, purrr::map2(then_names(), grp_placeholders(), ~  textInput(ns(.x), NULL, value = isolate(input[[.x]]), placeholder = .y) )),
+      column(1, purrr::map2(then_names(),  grp_placeholders(), ~ tags$div(class = "add_padding red", glue::glue("{newCol_n()$cnts[newCol_n()$newCol == default_val(isolate(input[[.x]]), .y)]}/{nrow(dat())}"))))
+    )
+  })
 
 
 
@@ -68,9 +71,8 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
     range_high <- reactive(purrr::map_dbl(high(), ~ default_val(input[[.x]], NA_real_)))
     range_names <- reactive(purrr::map2_chr(then_names(), grp_placeholders(), ~ default_val(input[[.x]], .y)))
 
-    # create a list of between statements to use in case when in parent module
+    # create a list of between statements to use in case_when in this module AND parent module
     between_expr <- reactive({
-
       temp <- purrr::pmap(
         list("between", reference_var(), range_low(), range_high(), range_names()),
         build_case_when_formula)
@@ -78,8 +80,8 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
       if (else_group()) append(temp, rlang::expr(TRUE ~ !!else_name())) else  append(temp, rlang::expr(TRUE ~ "NA"))
     })
 
-
-    mutate_expr_call <-reactive({
+    # Create an expression call using mutate and the between_expr() object above
+    mutate_expr_call <- reactive({
       colname <- "newCol"
       rlang::call2(
         quote(dplyr::mutate),
@@ -87,7 +89,8 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
       )
     })
 
-    # The mega list
+    # Insert that ^^ into a list with the data, and a
+    # dplyr::select() on our reference variable
     all_expressions <- reactive({
       list(
         rlang::expr(dat()),

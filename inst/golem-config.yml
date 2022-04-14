@@ -1,0 +1,8 @@
+default:
+  golem_name: shinyNewColumns
+  golem_version: 0.0.0.9000
+  app_prod: no
+production:
+  app_prod: yes
+dev:
+  golem_wd: C:/Users/aclark5/Documents/GitHub2/shinyNewColumns

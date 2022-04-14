@@ -101,6 +101,12 @@ mod_newCol_srv <- function(id, dat, colType) {
     # labels for if-then conditional groups
     conds <- reactive(paste0("cond",seq_len(input$numGroups)))
 
+    # just for screenshot
+    # # generate numerous UI's for new var's new groups (as needed)
+    # observeEvent(c(input$numGroups, colType()), {
+    #   output$cond_uis <- renderUI(mod_rangeConditions_ui(ns("cond1")))
+    # })
+
     # generate numerous UI's for new var's new groups (as needed)
     observeEvent(c(input$numGroups, colType()), {
       output$cond_uis <-
@@ -111,9 +117,25 @@ mod_newCol_srv <- function(id, dat, colType) {
         }
     })
 
+    # initialize reactive values to monitor how many
     rv_cnts <- reactiveValues()
 
-    # initialize reactive values to monitor how many
+    # # just for screenshots
+    # # When selected, call rangeConditions module, providing a number of inputs,
+    # #  wrapping them in a reactive context. Save the output as a reactive
+    # moduleExpr <- reactive({
+    #   req(input$numGroups)
+    #     mod_rangeConditions_srv(
+    #       id = "cond1",
+    #       dat = dat,
+    #       grp = reactive(input$numGroups),
+    #       reference_var = reactive(input$reference_var),
+    #       else_group = reactive(input$incl_else),
+    #       else_name = reactive(default_val(input$elseName, else_ph_util)))
+    # })
+
+
+    # When selected, call rangeConditions module, providing a number of inputs
     moduleExpr <- reactive({
       req(input$numGroups)
       if(colType() == "Range Variable") {
@@ -129,16 +151,12 @@ mod_newCol_srv <- function(id, dat, colType) {
       }
     })
 
-    # construct a call based on inputs
+    # construct a call based on inputs (again) & return to parent module
     expr_call <-reactive({
       req(moduleExpr())
       colname <- default_val(input$var_name, var_name_ph_util)
-      rlang::call2(
-        quote(dplyr::mutate),
-        !!colname := rlang::call2(
-          quote(dplyr::case_when),
-          !!!moduleExpr()
-        )
+      rlang::call2( quote(dplyr::mutate),
+        !!colname := rlang::call2(quote(dplyr::case_when),!!!moduleExpr())
       )
     })
 

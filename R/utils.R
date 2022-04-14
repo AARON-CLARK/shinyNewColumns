@@ -10,10 +10,13 @@
   else x
 }
 
+# dplyr case_when formula
 build_case_when_formula <- function(func, value, low, high, string) {
   rlang::expr(!!rlang::call2(func, rlang::sym(value), low, high, .ns = "dplyr") ~ !!string)
 }
 
+# test if first value Truthy, and if so
+# use it, else use a back up value
 default_val <- function(x, value) {
   if (isTruthy(x)) {
     x
@@ -21,6 +24,7 @@ default_val <- function(x, value) {
     value
   }
 }
+
 
 cntDecV <- Vectorize(function(x) {
   if ((x %% 1) != 0) {
@@ -30,8 +34,8 @@ cntDecV <- Vectorize(function(x) {
   }
 })
 
-# define the placeholder for the "Else" Group here, as it is referenced in many
-# places
+# Define the placeholder for the "Else" Group
+# here, as it is referenced in many places
 else_ph_util <- "Other Group"
 var_name_ph_util <- "ColName1"
 lab_name_ph_util <- "LabName1"
