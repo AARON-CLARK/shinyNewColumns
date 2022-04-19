@@ -20,8 +20,13 @@ to define a new column name, type, & label using reference column(s) as
 a basis to populate it’s values. Along the way, the module provides
 simple summaries & visuals of existing column’s distributions. When
 satisfied, the user can click ‘Add variable’ and the module returns the
-user supplied data.frame with the new column appended in addition to the
+user supplied data.frame with the new column appended PLUS the
 `dplyr::mutate()` expressions used to generate it.
+
+Click the `DEMO APPP` button below to launch an example app which
+leverages the `shinyNewColumns` module to create new columns in the
+popular `iris` data.frame. The app’s code is provided below as well.
+What are you waiting for? Go empower your users to make some columns!
 
 <center>
 <a href="https://bit.ly/shinynewcolumns">
@@ -44,6 +49,25 @@ Enjoy and please feel free to reach out with any questions by
 [submitting an
 issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the
 repo.
+
+## Purpose
+
+Imagine everyone’s worse nightmare - users interacting with vital data
+sources used on the back-end of your application. Why create a module
+that allows users to change data? Won’t they screw it up? Well, first of
+all, the data doesn’t ‘get changed’! When using `shinyNewColumns`, users
+are only allowed to **append** new columns to an existing data source,
+preserving the original data. Believe it or not, there **are** in fact
+use cases when creating new columns could help solve a lot of problems &
+paint points. Putting this (super)power into the hands of users can
+actually free up the data owner’s time (which can sometimes be the users
+themselves or sometimes developers), so why not?
+
+## Scope
+
+There are already a lot of R packages out there for editing data (such
+as `rhandsontable` or `editData`), so `shinyNewColumns` seeks to fill a
+small void in the niche that is deriving new data.
 
 ## Installation
 
@@ -91,11 +115,11 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 ```
 
-## Test drive now
+#### Test drive now
 
-The code above has been deployed on shinyapps.io for you to demo. Please
-click on the button below or you can even play with the application in
-the window below that.
+The example app code (above) has been deployed on shinyapps.io for your
+convenience. Please click on the button below to get started exploring
+`shinyNewColumns`:
 
 <center>
 <a href="https://bit.ly/shinynewcolumns">
@@ -103,27 +127,32 @@ the window below that.
 </a>
 </center>
 
+#### Visuals please!
+
+Here is how the UI of the `app.R` code above renders. Notice the only
+only component of `shinyNewColumns` seen below is the action button
+lablled `Add New Column`:
+
 <br>
 
-<style>
-.shiny-app-frame {
-  left: 0;
-  top: 50px;
-  bottom: 0;
-  right: 0;
-}
-.shiny-app-frame iframe {
-  width: 100%;
-  height: 700px;
-  border: none;
-}
-</style>
+<img src="man/figures/app_screenshot.PNG" width="85%" style="display: block; margin: auto;" />
 
-<div class="shiny-app-frame">
+<br>
 
-<iframe src="https://aclark.shinyapps.io/shinyNewColumns/" class="shiny-app">
-</iframe>
+Upon clicking the button, a modal will launch where the user is prompted
+to provide information about the the new column’s derivation! When done
+specifying your inputs, click `Add Variable` and presto! You just built
+a new column.
 
-</div>
+<br>
+
+<img src="man/figures/modal_range_screenshot.PNG" width="85%" style="display: block; margin: auto;" />
+
+<br>
+
+## `shinyNewColumns` Internals
+
+This section is really for developers looking to contribute to
+`shinyNewColumns`.
 
 <br>
