@@ -121,7 +121,7 @@ the window below that.
 
 <div class="shiny-app-frame">
 
-<iframe src="https://bit.ly/shinynewcolumns" class="shiny-app">
+<iframe src="https://aclark.shinyapps.io/shinyNewColumns/" class="shiny-app">
 </iframe>
 
 </div>

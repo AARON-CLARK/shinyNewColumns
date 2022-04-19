@@ -101,7 +101,7 @@ The code above has been deployed on shinyapps.io for you to demo. Please click o
 </style>
 
 <div class="shiny-app-frame"> 
-<iframe src = "https://bit.ly/shinynewcolumns" class="shiny-app">
+<iframe src = "https://aclark.shinyapps.io/shinyNewColumns/" class="shiny-app">
 </iframe>
 </div>
 
