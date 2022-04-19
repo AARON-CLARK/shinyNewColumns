@@ -21,7 +21,13 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-`shinyNewColumns` is a shiny module used to derive custom columns in R data.frames on the fly. The module simply produces one small UI element: an action button titled 'Create New Column' that can be placed anywhere in an existing shiny application. Upon clicking, a modal containing a user-friendly interface will launch & allow the user to build a new column off an existing data source. Specifically, the user will be able to select a new column type, name, label, and reference column(s) during derivation. Along the way, the module helps the user visualize existing column's distributions and summaries. Upon completion, the module returns the supplied data frame with the new column appended, and optional the `dplyr::mutate()` expressions used to create said column.
+`shinyNewColumns` is a shiny module used to derive custom columns in R data.frames on the fly. The module simply produces one small UI element: an action button titled 'Create New Column' that can be placed anywhere in an existing shiny application. Upon clicking, a modal containing a user-friendly interface will launch & allow the user to build a new column off an existing data source. Specifically, the user will be able to define a new column name, type, & label using reference column(s) as a basis to populate it's values. Along the way, the module provides simple summaries & visuals of existing column's distributions. When satisfied, the user can click 'Add variable' and the module returns the user supplied data.frame with the new column appended in addition to the `dplyr::mutate()` expressions used to generate it.
+
+<center>
+<a href="https://bit.ly/shinynewcolumns">
+<img src="man/figures/bttn_og_refresh_darkgrey.png" alt="Demo shinyNewColumns example app" width="15%">
+</a>
+</center>
 
 ## Shiny Conf 2022
 
@@ -37,7 +43,7 @@ remotes::install_github("AARON-CLARK/shinyNewColumns")
 
 ## Example App
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to integrate the `shinyNewColumns` module into a shiny app. On the UI side, you just need to decide where to place the a `Add New Column` button. The server-side logic only needs a data.frame to manipulate. The return value, `out` will contain the same data, with new column(s) appended and the `dplyr::mutate()` code used to generate it. 
 
 ```{r example, eval = FALSE}
 library(shinyNewColumns)
@@ -66,3 +72,38 @@ server <- function(input, output) {
 
 shinyApp(ui = ui, server = server)
 ```
+
+
+## Test drive now
+
+The code above has been deployed on shinyapps.io for you to demo. Please click on the button below or you can even play with the application in the window below that.
+
+<center>
+<a href="https://bit.ly/shinynewcolumns">
+<img src="man/figures/bttn_og_refresh_darkgrey.png" alt="Demo shinyNewColumns example app" width="15%">
+</a>
+</center>
+
+<br>
+
+<style>
+.shiny-app-frame {
+  left: 0;
+  top: 50px;
+  bottom: 0;
+  right: 0;
+}
+.shiny-app-frame iframe {
+  width: 100%;
+  height: 700px;
+  border: none;
+}
+</style>
+
+<div class="shiny-app-frame"> 
+<iframe src = "https://bit.ly/shinynewcolumns" class="shiny-app">
+</iframe>
+</div>
+
+<br>
+
