@@ -67,7 +67,6 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
 
     # create several vectors of text strings that will be used as
     # UI id's that have the same length as there are groups
-    grp_seq <- reactive(paste0(seq_len(grp())))
     low <- reactive(paste0("low", seq_len(grp())))
     high <- reactive(paste0("high", seq_len(grp())))
     then_names <- reactive(paste0("then", seq_len(grp())))

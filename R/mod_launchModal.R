@@ -64,6 +64,12 @@ mod_launchModal_srv <- function(id, dat) {
         ),
 
         # Fill Content of the Modal with the 'newCol' UI
+        conditionalPanel("input.createColType != 'Range Variable'", ns = ns,
+                         h3(div("This column type is under construction!",
+                                icon("hand-o-down", verify_fa = FALSE),
+                                style = "color:darkred;"))),
+        # img(src="shinyNewColumnsv7_flat_wYellowStars.png",
+        #     style=" padding-left:3px; height:100px;")
         mod_newCol_ui(ns("new"))
 
       )))

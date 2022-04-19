@@ -51,7 +51,7 @@ mod_newCol_ui <- function(id) {
 #' @param colType a text string, specifying a supported column type such as
 #'   "Range Variable"
 #'
-#' @return an exprression containing the `dplyr::mutate()` expressions used to
+#' @return an expression containing the `dplyr::mutate()` expressions used to
 #'   create new column
 #'
 #' @import shiny
@@ -128,11 +128,6 @@ mod_newCol_srv <- function(id, dat, colType) {
     # labels for if-then conditional groups
     conds <- reactive(paste0("cond",seq_len(input$numGroups)))
 
-    # just for screenshot
-    # # generate numerous UI's for new var's new groups (as needed)
-    # observeEvent(c(input$numGroups, colType()), {
-    #   output$cond_uis <- renderUI(mod_rangeConditions_ui(ns("cond1")))
-    # })
 
     # generate numerous UI's for new var's new groups (as needed)
     observeEvent(c(input$numGroups, colType()), {
@@ -146,20 +141,6 @@ mod_newCol_srv <- function(id, dat, colType) {
 
     # initialize reactive values to monitor how many
     rv_cnts <- reactiveValues()
-
-    # # just for screenshots
-    # # When selected, call rangeConditions module, providing a number of inputs,
-    # #  wrapping them in a reactive context. Save the output as a reactive
-    # moduleExpr <- reactive({
-    #   req(input$numGroups)
-    #     mod_rangeConditions_srv(
-    #       id = "cond1",
-    #       dat = dat,
-    #       grp = reactive(input$numGroups),
-    #       reference_var = reactive(input$reference_var),
-    #       else_group = reactive(input$incl_else),
-    #       else_name = reactive(default_val(input$elseName, else_ph_util)))
-    # })
 
 
     # When selected, call rangeConditions module, providing a number of inputs
