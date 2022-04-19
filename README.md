@@ -7,6 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
 
 `shinyNewColumns` is a shiny module used to derive custom columns in R
@@ -21,6 +22,22 @@ column’s distributions and summaries. Upon completion, the module
 returns the supplied data frame with the new column appended, and
 optional the `dplyr::mutate()` expressions used to create said column.
 
+## Shiny Conf 2022
+
+The `shinyNewColumns` shiny module was presented as a featured tutorial
+for the first annual Appsilon Shiny Conference in April of 2022. The
+subject of the tutorial was on “**Evaluating user inputs from
+dynamically produced UI modules**”. With time, Appsilon will post the
+tutorial’s recording to their
+[YouTube](https://www.youtube.com/channel/UC6LqpR5qBfNlQp5mVIVsthA)
+channel. In the meantime, feel free to checkout the presentation slide
+deck
+[here](https://github.com/AARON-CLARK/shinyNewColumns/tree/master/inst/example/shinyconf%20tutorial).
+Enjoy and please feel free to reach out with any questions by
+[submitting an
+issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the
+repo.
+
 ## Installation
 
 You can install the current development version of `shinyNewColumns`
@@ -30,7 +47,7 @@ from [GitHub](https://github.com/AARON-CLARK/shinyNewColumns) using:
 remotes::install_github("AARON-CLARK/shinyNewColumns")
 ```
 
-## Example
+## Example App
 
 This is a basic example which shows you how to solve a common problem:
 

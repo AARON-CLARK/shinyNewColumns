@@ -16,12 +16,16 @@ knitr::opts_chunk$set(
 # shinyNewColumns <a href='https://github.com/AARON-CLARK/shinyNewColumns'><img src="man/figures/hex-shinyNewColumns.png" align="right" height="170"/></a>
 
 <!-- badges: start -->
+
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
 
 `shinyNewColumns` is a shiny module used to derive custom columns in R data.frames on the fly. The module simply produces one small UI element: an action button titled 'Create New Column' that can be placed anywhere in an existing shiny application. Upon clicking, a modal containing a user-friendly interface will launch & allow the user to build a new column off an existing data source. Specifically, the user will be able to select a new column type, name, label, and reference column(s) during derivation. Along the way, the module helps the user visualize existing column's distributions and summaries. Upon completion, the module returns the supplied data frame with the new column appended, and optional the `dplyr::mutate()` expressions used to create said column.
 
+## Shiny Conf 2022
 
+The `shinyNewColumns` shiny module was presented as a featured tutorial for the first annual Appsilon Shiny Conference in April of 2022. The subject of the tutorial was on "**Evaluating user inputs from dynamically produced UI modules**". With time, Appsilon will post the tutorial's recording to their [YouTube](https://www.youtube.com/channel/UC6LqpR5qBfNlQp5mVIVsthA) channel. In the meantime, feel free to checkout the presentation slide deck [here](https://github.com/AARON-CLARK/shinyNewColumns/tree/master/inst/example/shinyconf%20tutorial). Enjoy and please feel free to reach out with any questions by [submitting an issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the repo.
 
 ## Installation
 
@@ -31,9 +35,7 @@ You can install the current development version of `shinyNewColumns` from [GitHu
 remotes::install_github("AARON-CLARK/shinyNewColumns")
 ```
 
-
-
-## Example
+## Example App
 
 This is a basic example which shows you how to solve a common problem:
 
