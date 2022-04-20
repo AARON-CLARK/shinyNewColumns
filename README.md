@@ -140,9 +140,7 @@ lablled `Add New Column`:
 <br>
 
 Upon clicking the button, a modal will launch where the user is prompted
-to provide information about the the new column’s derivation! When done
-specifying your inputs, click `Add Variable` and presto! You just built
-a new column.
+to provide information about the the new column’s derivation!
 
 <br>
 
@@ -150,9 +148,130 @@ a new column.
 
 <br>
 
-## `shinyNewColumns` Internals
+When done specifying your inputs, click `Add Variable` and presto! You
+just built a new column! In addition to the new addition, you’ll also
+observe that `shinyNewColumns` is capturing the `dplyr::mutate()` code
+used to generate it and `app.R` from our example app is promptly
+displaying it aboveo the data:
 
-This section is really for developers looking to contribute to
-`shinyNewColumns`.
+<br>
+
+<img src="man/figures/final_result_screenshot.PNG" width="85%" style="display: block; margin: auto;" />
+
+<br>
+
+## How `shinyNewColumns` works internally
+
+This section can serve as a ‘quick start guide’ for developers looking
+to gain some basic understanding about the module’s structure &
+contribute to `shinyNewColumns`.
+
+There are three re-occurring themes in `shinyNewColumns`: generating
+dynamic UI, bringing user inputs together into expressions (or list of
+expressions), and then evaluating the results at the top, high-level
+module. As of the date this guide was authored, there are 4 shiny
+modules leveraged (see image below). It’s assumed that overtime, more
+modules will be added to accommodate the needs of various column types.
+
+<br>
+
+<img src="man/figures/dev_guide_all_modules.PNG" width="85%" style="display: block; margin: auto;" />
+
+<br>
+
+#### Module UI
+
+From left to right, any `app.R` may call launchModal, launchModal then
+calls newCol, and newCol will call either rangeConditions or spin up `N`
+number of advConditions modules if the column type selected is ‘Custom’.
+launchModal is pretty basic, it only recieves a data.frame from `app.R`
+and contains the following UI elements:
+
+<br>
+
+<img src="man/figures/dev_guide_launchModal.PNG" width="85%" style="display: block; margin: auto;" />
+
+<br>
+
+As you can see, in only harbors the column type `selectInput()` at the
+top and a ‘Cancel’ & ‘Add Variable’ button at the bottom. The rest of
+the content is populated by newCol, which receives the data + the column
+type to produce the following UI:
+
+<br>
+
+<img src="man/figures/dev_guide_newCol_UI.PNG" width="85%" style="display: block; margin: auto;" />
+
+<br>
+
+This is where the user can begin to define the new column’s initial
+characteristics. The user is prompted to a variable name, label,
+reference variable, and number of conditions / groups. The reference
+variables are filtered to only show the numeric variables in the data
+since a Range Variable, by definition, creates groups (or categories)
+from a numeric range of values. The reference variable’s distribution is
+plotted on the right hand side for convenience.
+
+The reason newCol is separate from launchModal was to provide future
+space to call a completely different module in this `wellPanel()`
+depending on the column type selected. For example, not all column types
+are going to require a ‘reference variable’ and ‘number of
+conditions/groups’. So, keeping this `wellPanel()` modularized helps us
+swap in the correct UI when needed.
+
+Next, newCol passes the data, the reference variable, the number of
+groups, plus any else-group information down to the next shiny module.
+If column type = ‘Range Variable’, then the rangeConditions shiny module
+is called and which contains the following UI elements:
+
+<br>
+
+<img src="man/figures/dev_guide_rangeConditions_UI.PNG" width="85%" style="display: block; margin: auto;" />
+
+<br>
+
+From there, the user is prompted to input the range values using
+`numericInput()`s and group names. Conversely, if column type =
+‘Custom’, then any number of a advCondition modules will be rendered to
+coordinate with the number of groups selected on the slider from newCol.
+
+<br>
+
+<img src="man/figures/dev_guide_advConditions_UI.PNG" width="85%" style="display: block; margin: auto;" />
+<br>
+
+Here, users will provide numerous inputs to define their categorical
+groups.
+
+#### Returning expressions
+
+No matter what column type is selected, after the information is passed
+down to the deepest shiny module, it needs to get passed back up to
+`app.R`:
+
+<br>
+
+<img src="man/figures/dev_guide_modals_passing_info_dwn_up.gif" width="85%" style="display: block; margin: auto;" />
+
+<br>
+
+Since we know we want our end result to be a mutated data.frame using
+`dplyr`, we combine all the inputs at the base layer, rangeConditions in
+this case, and create our `mutate()` expression there. Then, pass that
+expression back up to the newCol, where expression receives it’s name &
+label before it’s passed up to launchModal for evaluation.
+
+We make heavy use of the amazing `rlang` pkg functions such as
+`call2()`, `expr()`, `sym()`, the bang-bang operator (`!!` or even
+`!!!`). And of course `base` R functions such as `quote()` & `eval()` to
+evaluate our results into actual executable `dplyr::mutate()` code. For
+more information on evaluation, check out the code, see `rlang`
+documentation, and/or watch the `shinyNewColumns` tutorial featured in
+[Shiny Conf 2022](#tutorial).
+
+## Have a question?
+
+Please please please open a new [GitHub
+issue](https://github.com/AARON-CLARK/shinyNewColumns/issues)!
 
 <br>
