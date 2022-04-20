@@ -26,7 +26,7 @@ user supplied data.frame with the new column appended PLUS the
 Click the `DEMO APPP` button below to launch an example app which
 leverages the `shinyNewColumns` module to create new columns in the
 popular `iris` data.frame. The app’s code is provided below as well.
-What are you waiting for? Go empower your users to make some columns!
+What are you waiting for? Go empower your users to make more columns!
 
 <center>
 <a href="https://bit.ly/shinynewcolumns">
@@ -36,11 +36,11 @@ What are you waiting for? Go empower your users to make some columns!
 
 ## Shiny Conf 2022
 
-The `shinyNewColumns` shiny module was presented as a featured tutorial
-for the first annual Appsilon Shiny Conference in April of 2022. The
-subject of the tutorial was on “**Evaluating user inputs from
-dynamically produced UI modules**”. With time, Appsilon will post the
-tutorial’s recording to their
+The `shinyNewColumns` shiny module was featured as a tutorial for the
+first annual Appsilon Shiny Conference in April of 2022. The subject of
+the tutorial was on “**Evaluating user inputs from dynamically produced
+UI modules**”. With time, Appsilon will post the tutorial’s recording to
+their
 [YouTube](https://www.youtube.com/channel/UC6LqpR5qBfNlQp5mVIVsthA)
 channel. In the meantime, feel free to checkout the presentation slide
 deck

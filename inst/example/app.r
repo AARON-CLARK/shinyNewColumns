@@ -1,6 +1,8 @@
 
 library(shiny)
 library(shinyNewColumns)
+library(DT)
+library(stringr)
 options(shiny.fullstacktrace = FALSE)
 
 # UI
@@ -26,7 +28,22 @@ ui <- fluidPage(
 server <- function(input, output) {
   out <- mod_launchModal_srv("snc", dat = iris)
   output$display_expr <- renderPrint(out$expr())
-  output$display_data <- renderDataTable(out$data())
+  output$display_data <- renderDataTable({
+    DT::datatable(
+      out$data(),
+      extensions = 'Buttons',
+      options = list(
+        dom = 'Blftpr',
+        pageLength = 15,
+        lengthMenu = list(c(15, 50, 100, -1),c('15', '50', '100', "All")),
+        buttons = list(list(
+        extend = "excel",
+        filename = paste("Iris dwnld",str_replace_all(str_replace(Sys.time(), " ", "_"),":", "-"), sep = "_")
+        ))
+      )
+      , style="default"
+    )
+  })
 }
 
 shinyApp(ui = ui, server = server)

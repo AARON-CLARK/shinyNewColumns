@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 `shinyNewColumns` is a shiny module used to derive custom columns in R data.frames on the fly. The module simply produces one small UI element: an action button titled 'Create New Column' that can be placed anywhere in an existing shiny application. Upon clicking, a modal containing a user-friendly interface will launch & allow the user to build a new column off an existing data source. Specifically, the user will be able to define a new column name, type, & label using reference column(s) as a basis to populate it's values. Along the way, the module provides simple summaries & visuals of existing column's distributions. When satisfied, the user can click 'Add variable' and the module returns the user supplied data.frame with the new column appended PLUS the `dplyr::mutate()` expressions used to generate it.
 
-Click the `DEMO APPP` button below to launch an example app which leverages the `shinyNewColumns` module to create new columns in the popular `iris` data.frame. The app's code is provided below as well. What are you waiting for? Go empower your users to make some columns!
+Click the `DEMO APPP` button below to launch an example app which leverages the `shinyNewColumns` module to create new columns in the popular `iris` data.frame. The app's code is provided below as well. What are you waiting for? Go empower your users to make more columns!
 
 <center>
 <a href="https://bit.ly/shinynewcolumns">
@@ -33,7 +33,7 @@ Click the `DEMO APPP` button below to launch an example app which leverages the 
 
 ## Shiny Conf 2022
 
-The `shinyNewColumns` shiny module was presented as a featured tutorial for the first annual Appsilon Shiny Conference in April of 2022. The subject of the tutorial was on "**Evaluating user inputs from dynamically produced UI modules**". With time, Appsilon will post the tutorial's recording to their [YouTube](https://www.youtube.com/channel/UC6LqpR5qBfNlQp5mVIVsthA) channel. In the meantime, feel free to checkout the presentation slide deck [here](https://github.com/AARON-CLARK/shinyNewColumns/tree/master/inst/example/shinyconf%20tutorial). Enjoy and please feel free to reach out with any questions by [submitting an issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the repo.
+The `shinyNewColumns` shiny module was featured as a tutorial for the first annual Appsilon Shiny Conference in April of 2022. The subject of the tutorial was on "**Evaluating user inputs from dynamically produced UI modules**". With time, Appsilon will post the tutorial's recording to their [YouTube](https://www.youtube.com/channel/UC6LqpR5qBfNlQp5mVIVsthA) channel. In the meantime, feel free to checkout the presentation slide deck [here](https://github.com/AARON-CLARK/shinyNewColumns/tree/master/inst/example/shinyconf%20tutorial). Enjoy and please feel free to reach out with any questions by [submitting an issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the repo.
 
 ## Purpose
 
