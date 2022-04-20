@@ -34,6 +34,8 @@ What are you waiting for? Go empower your users to make more columns!
 </a>
 </center>
 
+<br>
+
 ## Shiny Conf 2022
 
 The `shinyNewColumns` shiny module was featured as a tutorial for the
@@ -115,6 +117,8 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 ```
 
+<br>
+
 #### Test drive now
 
 The example app code (above) has been deployed on shinyapps.io for your
@@ -126,6 +130,8 @@ convenience. Please click on the button below to get started exploring
 <img src="man/figures/bttn_og_refresh_darkgrey.png" alt="Demo shinyNewColumns example app" width="15%">
 </a>
 </center>
+
+<br>
 
 #### Visuals please!
 
