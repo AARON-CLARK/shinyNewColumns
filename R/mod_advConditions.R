@@ -45,36 +45,37 @@ mod_advConditions_srv <- function(id, dat, cnt) {
 
     ns <- session$ns
 
-    cond_num <- reactive({
-      # find ns context. Example id <- "snc-newCol-cond1"
-      id <- as.character(session$ns(character()))
-      # determine current condition in loop
-      curr_cond <- substr(id,stringr::str_locate(id, "cond")[1],nchar(id))
+    observe({
       # if cond x doesn't exist in rv object, create it with initial value "1"
-      if(!(curr_cond %in% names(cnt))) cnt[[curr_cond]] <- 1
-      if(cnt[[curr_cond]] <= 0) cnt[[curr_cond]] <- 1 # safety net
-      return(curr_cond) # return current cond name
+      if(!(id %in% names(cnt))) cnt[[id]] <- 1
+      if(cnt[[id]] <= 0) cnt[[id]] <- 1 # safety net
+
+      # print("")
+      # print(paste("initialize id:", id))
+      # print(paste("cnt[[id]]:", cnt[[id]]))
     })
 
 
     # Add to case counter upon button click
     observeEvent(input$add, {
-      # print(paste("init cnt[[cond_num()]]:", isolate(cnt[[cond_num()]])))
-      cnt[[cond_num()]] <- isolate(cnt[[cond_num()]]) + 1
-      # print(paste("af add cnt[[cond_num()]]:", isolate(cnt[[cond_num()]])))
+      # print("")
+      # print("Add")
+      cnt[[paste0(id,"_chg")]] <-  1
     })
 
     # Subtract to case counter upon button click
     observeEvent(input$del, {
-      # print(paste("init cnt[[cond_num()]]:", isolate(cnt[[cond_num()]])))
-      cnt[[cond_num()]] <- isolate(cnt[[cond_num()]]) - 1
-      # print(paste("af minus cnt[[cond_num()]]:", isolate(cnt[[cond_num()]])))
+      # print("")
+      # print("Minus")
+      cnt[[paste0(id,"_chg")]] <-  (-1)
     })
 
-    var_names <- reactive(paste0("var",seq_len(cnt[[cond_num()]])))
-    ops_names <- reactive(paste0("ops",seq_len(cnt[[cond_num()]])))
-    val_names <- reactive(paste0("val",seq_len(cnt[[cond_num()]])))
-    nxt_names <- reactive(paste0("nxt",seq_len(cnt[[cond_num()]])))
+
+
+    var_names <- reactive(paste0("var",seq_len(cnt[[id]])))
+    ops_names <- reactive(paste0("ops",seq_len(cnt[[id]])))
+    val_names <- reactive(paste0("val",seq_len(cnt[[id]])))
+    nxt_names <- reactive(paste0("nxt",seq_len(cnt[[id]])))
 
     output$casewhens <- renderUI({
       num_ops <- c(">", "<", ">=", "<=")
@@ -122,12 +123,12 @@ mod_advConditions_srv <- function(id, dat, cnt) {
         }
         )),
 
-        column(2, if(cnt[[cond_num()]] != 1) purrr::map(nxt_names()[1:( length(nxt_names())-1)],
+        column(2, if(cnt[[id]] != 1) purrr::map(nxt_names()[1:( length(nxt_names())-1)],
                                                  ~ selectInput(ns(.x), NULL,
                                                                choices = c("AND" = "&", "OR" = "|"),
                                                                selected = isolate(input[[.x]])) )),
         column(3,
-               if(cnt[[cond_num()]] != 1) div(style = "display: inline-block;",
+               if(cnt[[id]] != 1) div(style = "display: inline-block;",
                                        actionButton(ns("del"), "Remove") ),
                div(style = "display: inline-block;",
                    actionButton(ns("add"), "Add Another") ))

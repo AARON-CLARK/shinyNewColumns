@@ -16,7 +16,7 @@ and connect the UI module to the server module.}
 "Range Variable"}
 }
 \value{
-an exprression containing the `dplyr::mutate()` expressions used to
+an expression containing the `dplyr::mutate()` expressions used to
   create new column
 }
 \description{

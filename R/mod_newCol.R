@@ -57,7 +57,7 @@ mod_newCol_ui <- function(id) {
 #' @import shiny
 #' @importFrom shinyFeedback showFeedbackDanger hideFeedback
 #' @importFrom ggplot2 ggplot aes_string geom_histogram xlab
-#' @importFrom purrr map
+#' @importFrom purrr map walk2
 #' @importFrom rlang call2
 #' @importFrom dplyr mutate case_when
 #'
@@ -126,21 +126,48 @@ mod_newCol_srv <- function(id, dat, colType) {
     })
 
     # labels for if-then conditional groups
-    conds <- reactive(paste0("cond",seq_len(input$numGroups)))
+    conds <- reactive({
+      req(input$numGroups)
+      paste0("cond",seq_len(input$numGroups))
+    })
 
 
     # generate numerous UI's for new var's new groups (as needed)
     observeEvent(c(input$numGroups, colType()), {
       output$cond_uis <-
-        if (colType() != "Custom") {
-          renderUI(mod_rangeConditions_ui(ns("cond1")))
-        } else {
-          renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
-        }
+        switch(colType(),
+        `Range Variable` = renderUI(mod_rangeConditions_ui(ns("cond1"))),
+        `TRUE/FALSE or Yes/No Flag` = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x)))),
+        Custom = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
+      )
+        # if (colType() != "Custom") {
+        #   renderUI(mod_rangeConditions_ui(ns("cond1")))
+        # } else {
+        #   renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
+        # }
     })
 
-    # initialize reactive values to monitor how many
+    # initialize reactive values to monitor AND maintain the number of condition rows
+    # are requested within each module/ wellPanel(), even when input$numGroups changes
     rv_cnts <- reactiveValues()
+    # observe(print(paste0(names(rv_cnts), ": ", reactiveValuesToList(rv_cnts), collapse = ", ")))
+
+
+    # keep track of rv_cnts as they are added or deleted in advConditions
+    # there is reduntant reactivity happening inside advConditions, so performing
+    # the count addition or subtraction outside the module
+    condX_chg <- reactive({
+      req(input$numGroups)
+      paste0("cond",seq_len(input$numGroups), "_chg")
+    })
+    observe({
+      purrr::walk2(conds(), condX_chg(), function(x, y) {
+        if(!is.null(rv_cnts[[y]])) {
+          rv_cnts[[x]] <- rv_cnts[[x]] + rv_cnts[[y]]
+          rv_cnts[[y]] <- NULL
+        }
+      })
+    })
 
 
     # When selected, call rangeConditions module, providing a number of inputs
