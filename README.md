@@ -36,7 +36,7 @@ What are you waiting for? Go empower your users to make more columns!
 
 <br>
 
-## Shiny Conf 2022
+## Shiny Conference 2022
 
 The `shinyNewColumns` shiny module was featured as a tutorial for the
 first annual Appsilon Shiny Conference in April of 2022. The subject of
