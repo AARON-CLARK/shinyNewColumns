@@ -38,7 +38,7 @@ server <- function(input, output) {
         lengthMenu = list(c(15, 50, 100, -1),c('15', '50', '100', "All")),
         buttons = list(list(
         extend = "excel",
-        filename = paste("Iris dwnld",str_replace_all(str_replace(Sys.time(), " ", "_"),":", "-"), sep = "_")
+        filename = paste("Iris_dwnld",str_replace_all(str_replace(Sys.time(), " ", "_"),":", "-"), sep = "_")
         ))
       )
       , style="default"
