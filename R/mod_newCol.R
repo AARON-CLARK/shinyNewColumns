@@ -74,8 +74,9 @@ mod_newCol_srv <- function(id, dat, colType) {
         selectInput(
           ns("reference_var"),
           label = switch(colType(),
-                         Custom = "Plot Variable Distribution",
-                         "Reference Variable"),
+                         `Range Variable` = "Reference Variable",
+                         # `Custom if-then-else` = "Plot Variable Distribution",
+                         "Plot Variable Distribution"),
           choices = switch(colType(),
                       `Range Variable` = names(dat()[sapply(dat(), is.numeric)]),
                       names(dat()) ),
@@ -137,8 +138,8 @@ mod_newCol_srv <- function(id, dat, colType) {
       output$cond_uis <-
         switch(colType(),
         `Range Variable` = renderUI(mod_rangeConditions_ui(ns("cond1"))),
-        `TRUE/FALSE or Yes/No Flag` = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x)))),
-        Custom = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
+        `TRUE/FALSE or Yes/No Flag` = renderUI(mod_flagConditions_ui(ns("cond1"))),
+        `Custom if-then-else` = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
       )
     })
 
@@ -172,17 +173,29 @@ mod_newCol_srv <- function(id, dat, colType) {
     # Call appropriate module's server-side logic, passing appropriate inputs
     moduleExpr <- reactive({
       req(input$numGroups)
-      if(colType() == "Range Variable") {
-          mod_rangeConditions_srv(
-             id = "cond1",
-             dat = dat,
-             grp = reactive(input$numGroups),
-             reference_var = reactive(input$reference_var),
-             else_group = reactive(input$incl_else),
-             else_name = reactive(default_val(input$elseName, else_ph_util)))
-      } else {
-        purrr::map(conds(), ~ mod_advConditions_srv(id = .x, dat = dat, cnt = rv_cnts))
-      }
+      switch(colType(),
+
+       `Range Variable` =
+         mod_rangeConditions_srv(
+           id = "cond1",
+           dat = dat,
+           grp = reactive(input$numGroups),
+           reference_var = reactive(input$reference_var),
+           else_group = reactive(input$incl_else),
+           else_name = reactive(default_val(input$elseName, else_ph_util))),
+
+       `TRUE/FALSE or Yes/No Flag` =
+         mod_rangeConditions_srv(
+           id = "cond1",
+           dat = dat,
+           grp = reactive(input$numGroups),
+           reference_var = reactive(input$reference_var),
+           else_group = reactive(input$incl_else),
+           else_name = reactive(default_val(input$elseName, else_ph_util))),
+
+       `Custom if-then-else` =
+         purrr::map(conds(), ~ mod_advConditions_srv(id = .x, dat = dat, cnt = rv_cnts))
+       )
     })
 
     # construct a call based on inputs (again) & return to parent module

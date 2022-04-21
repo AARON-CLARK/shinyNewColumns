@@ -56,8 +56,10 @@ mod_launchModal_srv <- function(id, dat) {
         title = div(style="width:100%;padding-top:10px;",
           column(6, div(style="font-weight:bold;padding-top:5px;text-align:right", "New Column Type:")),
           column(6, selectInput(ns("createColType"), NULL,
-                      choices = c("Range Variable","TRUE/FALSE or Yes/No Flag", "Custom"),
-                      selected="Range Variable"))
+              choices = c("Range Variable",
+                          "TRUE/FALSE or Yes/No Flag",
+                          "Custom if-then-else"),
+              selected="Range Variable"))
         ),
 
         footer = tagList(
