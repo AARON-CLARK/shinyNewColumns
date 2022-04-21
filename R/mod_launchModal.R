@@ -59,7 +59,8 @@ mod_launchModal_srv <- function(id, dat) {
               choices = c("Range Variable",
                           "TRUE/FALSE or Yes/No Flag",
                           "Custom if-then-else"),
-              selected="Range Variable"))
+              selected = "TRUE/FALSE or Yes/No Flag"))
+              # selected = "Range Variable"))
         ),
 
         footer = tagList(
@@ -106,10 +107,10 @@ mod_launchModal_srv <- function(id, dat) {
         rv$all_mutates         # current + any other mutates
       )
 
-      # Create the new data frame with mutate(s) applied
-      rv$data <- rlang::flatten(data_and_expr) %>%
-        purrr::reduce(~rlang::expr(!!.x %>% !!.y)) %>%
-        eval()
+      # # Create the new data frame with mutate(s) applied
+      # rv$data <- rlang::flatten(data_and_expr) %>%
+      #   purrr::reduce(~rlang::expr(!!.x %>% !!.y)) %>%
+      #   eval()
 
       removeModal()
     })

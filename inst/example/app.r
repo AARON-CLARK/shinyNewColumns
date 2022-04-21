@@ -4,7 +4,7 @@ library(shinyNewColumns)
 library(DT)
 library(stringr)
 
-options(shiny.fullstacktrace = FALSE)
+options(shiny.fullstacktrace = TRUE)
 
 # UI
 ui <- fluidPage(
