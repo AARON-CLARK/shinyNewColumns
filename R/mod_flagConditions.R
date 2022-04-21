@@ -27,7 +27,7 @@ mod_flagConditions_ui <- function(id) {
 #'   create new column
 #'
 #' @import shiny
-#' @importFrom purrr map map2 reduce pmap
+#' @importFrom purrr map map2 reduce pmap map_dbl
 #' @importFrom rlang call2 expr
 #' @importFrom glue glue
 #' @importFrom dplyr between mutate case_when group_by summarize select
@@ -72,6 +72,7 @@ mod_flagConditions_srv <- function(id, dat, grp, reference_var, else_group, else
     # then <- reactive(paste0("then", seq_len(grp())))
     # grp_ph <- reactive(paste("Group", seq_len(grp())))
 
+
     var <- reactive(paste0("var",seq_len(grp())))
     ops <- reactive(paste0("ops",seq_len(grp())))
     val <- reactive(paste0("val",seq_len(grp())))
@@ -79,14 +80,12 @@ mod_flagConditions_srv <- function(id, dat, grp, reference_var, else_group, else
     then <- reactive(paste0("then", seq_len(grp())))
     grp_ph <- reactive(paste("Group", seq_len(grp())))
 
+
+
     output$casewhens <- renderUI({
       req(flg_typ())
       flg_choices <- unlist(str_split(flg_typ(), "\\/"))
       if(flg_typ() == "TRUE/FALSE") flg_choices <- as.logical(flg_choices)
-
-      num_ops <- c(">", "<", ">=", "<=")
-      eql_ops <- c("=", "!=")
-      chr_ops <- c("IN", "NOT IN", "CONTAINS", "DOESN'T CONTAIN")
 
       fluidRow(
         column(1, purrr::map(var(), ~ tags$div(class = "add_padding", glue::glue("IF")))),
@@ -99,12 +98,13 @@ mod_flagConditions_srv <- function(id, dat, grp, reference_var, else_group, else
             if(all(sapply(dat()[input[[.y]]], is.numeric))) {c(eql_ops, num_ops)} else {c(eql_ops, chr_ops)},
             selected = isolate(input[[.x]])) ))),
 
-        column(2, purrr::pmap(list(val(), var(), ops()), function(.x, .y, .z){
+        column(2, purrr::pmap(list(val(), var(), ops()), function(.x, .y, .z){ #, means() .m
           div(style = "text-align: center;",
               # if variable is numeric, value must be numeric
               if(all(sapply(dat()[input[[.y]]], is.numeric))) {
                 div(style = "padding-bottom:5px;",
-                    numericInput(ns(.x), NULL, value = isolate(input[[.x]])) )
+                    numericInput(ns(.x), NULL,
+                      value = isolate(input[[.x]]) %||% 0) )
               } else {
                 # --- Variable is not numeric ---
                 # if operator is Contains or Doesn't Contain, user can enter free text
@@ -114,7 +114,7 @@ mod_flagConditions_srv <- function(id, dat, grp, reference_var, else_group, else
                 } else {
                   # operator is not contains
                   # and is = or !=
-                  if(input[[.z]] %in% eql_ops){ # looking for single value
+                  if(input[[.z]] %in% c("==", "!=")){ # looking for single value
                     selectInput(ns(.x), NULL, choices = unique(dat()[input[[.y]]]),
                                 selected = isolate(input[[.x]]))
                   } else {
@@ -150,37 +150,102 @@ mod_flagConditions_srv <- function(id, dat, grp, reference_var, else_group, else
       )
     })
 
+    # means <- reactive({
+    #   req(var())
+    #   purrr::map_dbl(var(), function(x) {
+    #     req(input[[x]])
+    #     if(all(sapply(dat()[input[[x]]], is.numeric))) {
+    #       mean(dat()[,input[[x]]], na.rm = T)
+    #     } else {
+    #       NA_real_
+    #     }
+    #   })
+    # })
+    # observe({
+    #   req(means())
+    #   pmap(list(var(), val(), means()), function(c, v, m) {
+    #     if(all(sapply(dat()[input[[c]]], is.numeric)) & is.null(input[[v]])){
+    #       updateNumericInput(ns(input[[v]]), NULL, value = m)
+    #     }
+    #   })
+    # })
+    # observe({
+    #   print("")
+    #   print(paste(var(), means()))
+    # })
+
+    # get all the range low & high values + string outputs
+    resp_var <- reactive(purrr::map_chr(var(), ~ default_val(input[[.x]], NA_character_)))
+    resp_ops <- reactive(purrr::map_chr(ops(), ~ default_val(input[[.x]], NA_character_)))
+    # resp_val <- reactive(purrr::map_chr(ops(), ~ default_val(input[[.x]], NA_character_)))
+    # It doesn't really matter if we classify the value as numeric or character does it?
+    resp_val <- reactive({
+      purrr::map2(val(), var(), function(.x, .y){ #, means() .m
+        # if variable is numeric, so value must be numeric
+        if(all(sapply(dat()[input[[.y]]], is.numeric))) {
+          default_val(input[[.x]], NA_real_)
+        } else { # --- Variable is not numeric ---
+          glue::glue("'{default_val(input[[.x]], NA_character_)}'")
+        }
+      }
+      )
+    })
+    resp_flg <- reactive(purrr::map_chr(then(), ~ default_val(input[[.x]], NA_character_ )))
+
+    observe({
+      print("")
+      print(
+        paste(
+          ifelse(any(stringr::str_detect(resp_ops(), c("NOT", "DOESN'T"))), "!(", ""),
+          if(stringr::str_detect(resp_ops(), "CONTAIN")) {
+            paste("stringr::str_detect(", resp_var(), ", ", unlist(resp_val()), ")")
+          } else {
+            paste(
+              resp_var(),
+              ifelse(resp_ops() == "IN", "%in%", resp_ops()),
+              resp_val(),
+            )
+          },
+          ifelse(any(stringr::str_detect(resp_ops(), c("NOT", "DOESN'T"))), ")", ""),
+          "~",
+          resp_flg()
+        )
+      )
+    })
+    # stringr::str_detect(resp_var(), resp_val())
+    # stringr::str_detect(resp_ops(), c("NOT", "DOESN'T"))
+    # stringr::str_detect(c("NOT IN", "DOESN'T CONTAIN"), c("NOT"))
+    # c("NOT", "DOESN'T") %in% c("NOT IN", "DOESN'T CONTAIN")
 
 
-    # # get all the range low & high values + string outputs
-    # range_low <- reactive(purrr::map_dbl(low(), ~ default_val(input[[.x]], NA_real_)))
-    # range_high <- reactive(purrr::map_dbl(high(), ~ default_val(input[[.x]], NA_real_)))
-    # range_names <- reactive(purrr::map2_chr(then(), grp_ph(), ~ default_val(input[[.x]], .y)))
-    #
-    # # create a list of between statements to use in case_when in this module AND parent module
-    # between_expr <- reactive({
+
+    # create a list of between statements to use in case_when in this module AND parent module
+    # flag_expr <- reactive({
     #   temp <- purrr::pmap(
-    #     list("between", reference_var(), range_low(), range_high(), range_names()),
-    #     build_case_when_formula)
+    #     list(resp_var(), resp_ops(), resp_val(), resp_flg()),
+    #       function(func, var, ops, val, flg) {
+    #         rlang::expr(!!rlang::call2(func, rlang::sym(value), low, high, .ns = "dplyr") ~ !!string)
+    #       }
+    #     )
     #
     #   if (else_group()) append(temp, rlang::expr(TRUE ~ !!else_name())) else  append(temp, rlang::expr(TRUE ~ "NA"))
     # })
     #
-    # # Create an expression call using mutate and the between_expr() object above
+    # # Create an expression call using mutate and the flag_expr() object above
     # mutate_expr_call <- reactive({
     #   colname <- "newCol"
     #   rlang::call2(
     #     quote(dplyr::mutate),
-    #     !!colname := rlang::call2(quote(dplyr::case_when),!!!between_expr())
+    #     !!colname := rlang::call2(quote(dplyr::case_when),!!!flag_expr())
     #   )
     # })
-    #
+
     # # Insert that ^^ into a list with the data, and a
     # # dplyr::select() on our reference variable
     # all_expressions <- reactive({
     #   list(
     #     rlang::expr(dat()),
-    #     rlang::expr(dplyr::select(reference_var())),
+    #     rlang::expr(dplyr::select(resp_var())),
     #     mutate_expr_call()
     #   )
     # })
@@ -188,7 +253,7 @@ mod_flagConditions_srv <- function(id, dat, grp, reference_var, else_group, else
     # # Create the new column and group by it so we have accurate row
     # # counts to display next to each condition
     # mutated_dat <- reactive({
-    #   !any(is.na(range_names()))
+    #   !any(is.na(resp_flg()))
     #   all_expressions() %>%
     #     purrr::reduce(~ rlang::expr(!!.x %>% !!.y)) %>%
     #     eval()
@@ -236,6 +301,6 @@ mod_flagConditions_srv <- function(id, dat, grp, reference_var, else_group, else
     # #    } else {shinyjs::enable("snc-addCol")}
     # # })
     #
-    # return(between_expr())
+    # return(flag_expr())
   })
 }

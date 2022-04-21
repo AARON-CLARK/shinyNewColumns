@@ -78,9 +78,6 @@ mod_advConditions_srv <- function(id, dat, cnt) {
     nxt_names <- reactive(paste0("nxt",seq_len(cnt[[id]])))
 
     output$casewhens <- renderUI({
-      num_ops <- c(">", "<", ">=", "<=")
-      eql_ops <- c("=", "!=")
-      chr_ops <- c("IN", "NOT IN", "CONTAINS", "DOESN'T CONTAIN")
 
       fluidRow(
 
@@ -109,7 +106,7 @@ mod_advConditions_srv <- function(id, dat, cnt) {
                       textInput(ns(.x), NULL, value = isolate(input[[.x]])) )
                 } else {
                   # operator is not contains
-                  if(input[[.z]] %in% eql_ops){ # looking for single value
+                  if(input[[.z]] %in% c("==", "!=")){ # looking for single value
                     selectInput(ns(.x), NULL, choices = unique(dat()[input[[.y]]]),
                                 selected = isolate(input[[.x]]))
                   } else {
