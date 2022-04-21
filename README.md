@@ -47,10 +47,13 @@ their
 channel. In the meantime, feel free to checkout the presentation slide
 deck
 [here](https://github.com/AARON-CLARK/shinyNewColumns/tree/master/inst/example/shinyconf%20tutorial).
-Enjoy and please feel free to reach out with any questions by
-[submitting an
+Please feel free to reach out with any questions by [submitting an
 issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the
 repo.
+
+Note: As you navigate through the repo, please keep in mind that the
+code has likely changed (hopefully for the better) since the
+presentation originally aired.
 
 ## Purpose
 
