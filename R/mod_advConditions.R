@@ -47,12 +47,12 @@ mod_advConditions_srv <- function(id, dat, cnt) {
 
     observe({
       # if cond x doesn't exist in rv object, create it with initial value "1"
-      if(!(id %in% names(cnt))) cnt[[id]] <- 1
-      if(cnt[[id]] <= 0) cnt[[id]] <- 1 # safety net
 
       # print("")
       # print(paste("initialize id:", id))
       # print(paste("cnt[[id]]:", cnt[[id]]))
+      if(!(id %in% names(cnt))) cnt[[id]] <- 1
+      if(cnt[[id]] <= 0) cnt[[id]] <- 1 # safety net
     })
 
 
@@ -136,7 +136,7 @@ mod_advConditions_srv <- function(id, dat, cnt) {
 
     })
 
-    # module needs to return all the conditions for a single group
-    # return() #case_count = cnt
+    # module needs to return all the conditions for a single group as an expression
+    # return()
   })
 }

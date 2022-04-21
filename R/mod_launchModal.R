@@ -52,12 +52,14 @@ mod_launchModal_srv <- function(id, dat) {
     observeEvent(input$createColBttn, {
 
       showModal(tags$div(id="new_col_modal", modalDialog(
+
         title = div(style="width:100%;padding-top:10px;",
           column(6, div(style="font-weight:bold;padding-top:5px;text-align:right", "New Column Type:")),
           column(6, selectInput(ns("createColType"), NULL,
                       choices = c("Range Variable","TRUE/FALSE or Yes/No Flag", "Custom"),
                       selected="Range Variable"))
         ),
+
         footer = tagList(
           modalButton("Cancel"),
           actionButton(ns("addCol"),"Add Variable")
@@ -68,8 +70,8 @@ mod_launchModal_srv <- function(id, dat) {
                          h3(div("This column type is under construction!",
                                 icon("hand-o-down", verify_fa = FALSE),
                                 style = "color:darkred;"))),
-        # img(src="shinyNewColumnsv7_flat_wYellowStars.png",
-        #     style=" padding-left:3px; height:100px;")
+
+        # newCol UI
         mod_newCol_ui(ns("new"))
 
       )))

@@ -140,22 +140,21 @@ mod_newCol_srv <- function(id, dat, colType) {
         `TRUE/FALSE or Yes/No Flag` = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x)))),
         Custom = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
       )
-        # if (colType() != "Custom") {
-        #   renderUI(mod_rangeConditions_ui(ns("cond1")))
-        # } else {
-        #   renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
-        # }
     })
 
-    # initialize reactive values to monitor AND maintain the number of condition rows
-    # are requested within each module/ wellPanel(), even when input$numGroups changes
+    # initialize reactive values to monitor AND maintain the number of condition
+    # rows requested within each module/ wellPanel() of advConditions, even when
+    # input$numGroups changes
     rv_cnts <- reactiveValues()
-    # observe(print(paste0(names(rv_cnts), ": ", reactiveValuesToList(rv_cnts), collapse = ", ")))
+
+    # # print for debugging
+    # observe(print(paste0(names(rv_cnts), ": ",
+    #   reactiveValuesToList(rv_cnts), collapse = ", ")))
 
 
     # keep track of rv_cnts as they are added or deleted in advConditions
     # there is reduntant reactivity happening inside advConditions, so performing
-    # the count addition or subtraction outside the module
+    # the count addition or subtraction outside the module is preferred
     condX_chg <- reactive({
       req(input$numGroups)
       paste0("cond",seq_len(input$numGroups), "_chg")
@@ -170,7 +169,7 @@ mod_newCol_srv <- function(id, dat, colType) {
     })
 
 
-    # When selected, call rangeConditions module, providing a number of inputs
+    # Call appropriate module's server-side logic, passing appropriate inputs
     moduleExpr <- reactive({
       req(input$numGroups)
       if(colType() == "Range Variable") {

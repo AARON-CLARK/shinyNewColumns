@@ -3,6 +3,7 @@ library(shiny)
 library(shinyNewColumns)
 library(DT)
 library(stringr)
+
 options(shiny.fullstacktrace = FALSE)
 
 # UI
@@ -30,7 +31,7 @@ server <- function(input, output) {
   output$display_expr <- renderPrint(out$expr())
   output$display_data <- renderDataTable({
     DT::datatable(
-      out$data(),
+      out$data(), ### left off here
       extensions = 'Buttons',
       options = list(
         dom = 'Blftpr',
