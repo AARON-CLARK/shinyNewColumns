@@ -62,7 +62,6 @@ mod_newCol_ui <- function(id) {
 #' @importFrom purrr map walk2
 #' @importFrom rlang call2
 #' @importFrom dplyr mutate case_when
-#' @importFrom shinyjs show hide
 #'
 mod_newCol_srv <- function(id, dat, colType) {
   moduleServer(id, function(input, output, session) {
