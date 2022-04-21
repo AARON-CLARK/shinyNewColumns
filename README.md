@@ -52,6 +52,10 @@ Enjoy and please feel free to reach out with any questions by
 issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the
 repo.
 
+Note: As you navigate through the repo, please keep in mind that the
+code has likely changed (hopefully for the better) since the
+presentation originally aired.
+
 ## Purpose
 
 Imagine everyone’s worse nightmare - users interacting with vital data

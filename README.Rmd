@@ -37,6 +37,8 @@ Click the `DEMO APPP` button below to launch an example app which leverages the 
 
 The `shinyNewColumns` shiny module was featured as a tutorial for the first annual Appsilon Shiny Conference in April of 2022. The subject of the tutorial was on "**Evaluating user inputs from dynamically produced UI modules**". With time, Appsilon will post the tutorial's recording to their [YouTube](https://www.youtube.com/channel/UC6LqpR5qBfNlQp5mVIVsthA) channel. In the meantime, feel free to checkout the presentation slide deck [here](https://github.com/AARON-CLARK/shinyNewColumns/tree/master/inst/example/shinyconf%20tutorial). Enjoy and please feel free to reach out with any questions by [submitting an issue](https://github.com/AARON-CLARK/shinyNewColumns/issues) to the repo.
 
+Note: As you navigate through the repo, please keep in mind that the code has likely changed (hopefully for the better) since the presentation originally aired.
+
 ## Purpose
 
 Imagine everyone's worse nightmare - users interacting with vital data sources used on the back-end of your application. Why create a module that allows users to change data? Won't they screw it up? Well, first of all, the data doesn't 'get changed'! When using `shinyNewColumns`, users are only allowed to **append** new columns to an existing data source, preserving the original data. Believe it or not, there **are** in fact use cases when creating new columns could help solve a lot of problems & paint points. Putting this (super)power into the hands of users can actually free up the data owner's time (which can sometimes be the users themselves or sometimes developers), so why not?
