@@ -27,6 +27,7 @@ usethis::use_package("purrr")
 usethis::use_package("shinyFeedback")
 usethis::use_package("magrittr")
 
+# usethis::use_package("shinyjs")
 # usethis::use_package("tibble")
 # usethis::use_package("cicerone")
 # usethis::use_package("shinyWidgets")

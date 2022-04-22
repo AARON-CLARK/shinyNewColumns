@@ -76,3 +76,8 @@ cntDecV <- Vectorize(function(x) {
 else_ph_util <- "Other Group"
 var_name_ph_util <- "ColName1"
 lab_name_ph_util <- "LabName1"
+
+# define different types of operators supported by one or more modules
+num_ops <- c(">", "<", ">=", "<=")
+eql_ops <- c("=" = "==", "!=")
+chr_ops <- c("IN", "NOT IN", "CONTAINS", "DOESN'T CONTAIN")

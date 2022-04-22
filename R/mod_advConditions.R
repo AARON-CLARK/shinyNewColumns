@@ -78,9 +78,6 @@ mod_advConditions_srv <- function(id, dat, cnt) {
     nxt_names <- reactive(paste0("nxt",seq_len(cnt[[id]])))
 
     output$casewhens <- renderUI({
-      num_ops <- c(">", "<", ">=", "<=")
-      bth_ops <- c("=", "!=")
-      chr_ops <- c("IN", "NOT IN", "CONTAINS", "DOESN'T CONTAIN")
 
       fluidRow(
 
@@ -92,7 +89,7 @@ mod_advConditions_srv <- function(id, dat, cnt) {
         column(2, purrr::map2(ops_names(), var_names(),
                               ~ div(style = "text-align: center;",
                                     selectInput(ns(.x), NULL,
-                                                choices = if(all(sapply(dat()[input[[.y]]], is.numeric))) {c(bth_ops, num_ops)} else {c(bth_ops, chr_ops)},
+                                                choices = if(all(sapply(dat()[input[[.y]]], is.numeric))) {c(eql_ops, num_ops)} else {c(eql_ops, chr_ops)},
                                                 selected = isolate(input[[.x]])) ))),
 
         column(3, purrr::pmap(list(val_names(), var_names(), ops_names()), function(.x, .y, .z){
@@ -109,7 +106,7 @@ mod_advConditions_srv <- function(id, dat, cnt) {
                       textInput(ns(.x), NULL, value = isolate(input[[.x]])) )
                 } else {
                   # operator is not contains
-                  if(input[[.z]] %in% c("=", "!=")){ # looking for single value
+                  if(input[[.z]] %in% c("==", "!=")){ # looking for single value
                     selectInput(ns(.x), NULL, choices = unique(dat()[input[[.y]]]),
                                 selected = isolate(input[[.x]]))
                   } else {

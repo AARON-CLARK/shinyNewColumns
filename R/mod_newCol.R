@@ -15,6 +15,7 @@
 mod_newCol_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
+    # shinyjs::useShinyjs(),
     shinyFeedback::useShinyFeedback(),
     wellPanel(
       fluidRow(
@@ -24,7 +25,8 @@ mod_newCol_ui <- function(id) {
                ),
         column(4,
                fluidRow(
-                 column(8,  uiOutput(ns("ref_var_ui"))),
+                 column(8, uiOutput(ns("ref_var_ui"))),
+                 column(4, uiOutput(ns("flag_type_ui")))
                ),
                fluidRow(
                  column(8, sliderInput(ns("numGroups"), "Number of conditions/ groups", 1, 10, 1)),
@@ -36,7 +38,7 @@ mod_newCol_ui <- function(id) {
     uiOutput(ns("cond_uis")),
     conditionalPanel("input.incl_else", ns = ns,
       wellPanel(
-        textInput(ns("elseName"), "Else:", placeholder = else_ph_util)
+        uiOutput(ns("elseName_ui"))
       )
     )
   )
@@ -74,8 +76,9 @@ mod_newCol_srv <- function(id, dat, colType) {
         selectInput(
           ns("reference_var"),
           label = switch(colType(),
-                         Custom = "Plot Variable Distribution",
-                         "Reference Variable"),
+                         `Range Variable` = "Reference Variable",
+                         # `Custom if-then-else` = "Plot Variable Distribution",
+                         "Plot Variable Distribution"),
           choices = switch(colType(),
                       `Range Variable` = names(dat()[sapply(dat(), is.numeric)]),
                       names(dat()) ),
@@ -84,6 +87,51 @@ mod_newCol_srv <- function(id, dat, colType) {
       })
     })
 
+    # if column type is a Y/N flag, then we want to ask the user
+    # what kind of flag or response to expect
+    observeEvent(colType(), {
+      if(colType() == 'TRUE/FALSE or Yes/No Flag') {
+        output$flag_type_ui <- renderUI({
+          radioButtons(ns("flag_type"), label = "Flag Type",
+                       choices = c("Y/N", "Yes/No", "TRUE/FALSE", "Custom"))
+        })
+        # shinyjs::show(ns("flag_type"))
+      } else {
+        output$flag_type_ui <- NULL
+        # shinyjs::hide(ns("flag_type"))
+      }
+    })
+
+    # if column type is a Y/N flag, then we'll want to automatically match the
+    # shiny input and populate the elseName with the correct value
+    observeEvent(list(colType(), input$flag_type), {
+    # observe({
+    req(colType())
+      # if(!is.null(input$flag_type)) {
+      if(colType() == 'TRUE/FALSE or Yes/No Flag') {
+        req(input$flag_type)
+
+        # if flag_type is not custom, create a selectInput with useful values
+        if(input$flag_type != 'Custom'){
+          flg_choices <- unlist(str_split(input$flag_type, "\\/"))
+          if(input$flag_type == "TRUE/FALSE") flg_choices <- as.logical(flg_choices)
+          output$elseName_ui <- renderUI({
+            selectInput(ns("elseName"), "Else:", choices = rev(flg_choices),
+              selected = #flg_choices[2])
+                isolate(input$elseName) )# %||% flg_choices[2])
+          })
+        } else {
+          output$elseName_ui <- renderUI({
+            textInput(ns("elseName"), "Else:",
+              value = isolate(input$elseName), placeholder = input$flag_type)
+          })
+        }
+      } else {
+        output$elseName_ui <- renderUI({
+          textInput(ns("elseName"), "Else:", placeholder = else_ph_util)
+        })
+      }
+    })
 
     # create histogram of reference variable
     output$var_hist <- renderPlot({
@@ -136,9 +184,9 @@ mod_newCol_srv <- function(id, dat, colType) {
     observeEvent(c(input$numGroups, colType()), {
       output$cond_uis <-
         switch(colType(),
-        `Range Variable` = renderUI(mod_rangeConditions_ui(ns("cond1"))),
-        `TRUE/FALSE or Yes/No Flag` = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x)))),
-        Custom = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
+        `Range Variable` = renderUI(mod_rangeConditions_ui(ns("range1"))),
+        `TRUE/FALSE or Yes/No Flag` = renderUI(mod_flagConditions_ui(ns("flag1"))),
+        `Custom if-then-else` = renderUI( purrr::map(conds(), ~ mod_advConditions_ui(ns(.x))))
       )
     })
 
@@ -172,34 +220,51 @@ mod_newCol_srv <- function(id, dat, colType) {
     # Call appropriate module's server-side logic, passing appropriate inputs
     moduleExpr <- reactive({
       req(input$numGroups)
-      if(colType() == "Range Variable") {
-          mod_rangeConditions_srv(
-             id = "cond1",
-             dat = dat,
-             grp = reactive(input$numGroups),
-             reference_var = reactive(input$reference_var),
-             else_group = reactive(input$incl_else),
-             else_name = reactive(default_val(input$elseName, else_ph_util)))
-      } else {
-        purrr::map(conds(), ~ mod_advConditions_srv(id = .x, dat = dat, cnt = rv_cnts))
-      }
+      switch(colType(),
+
+       `Range Variable` =
+         mod_rangeConditions_srv(
+           id = "range1",
+           dat = dat,
+           grp = reactive(input$numGroups),
+           reference_var = reactive(input$reference_var),
+           else_group = reactive(input$incl_else),
+           else_name = reactive(default_val(input$elseName, else_ph_util))),
+
+       `TRUE/FALSE or Yes/No Flag` =
+         mod_flagConditions_srv(
+           id = "flag1",
+           dat = dat,
+           grp = reactive(input$numGroups),
+           reference_var = reactive(input$reference_var),
+           else_group = reactive(input$incl_else),
+           else_name = reactive(default_val(input$elseName, else_ph_util)),
+           flg_typ = reactive(input$flag_type)
+           ),
+
+       `Custom if-then-else` =
+         purrr::map(conds(), ~ mod_advConditions_srv(id = .x, dat = dat, cnt = rv_cnts))
+       )
     })
 
-    # construct a call based on inputs (again) & return to parent module
-    expr_call <-reactive({
-      req(moduleExpr())
-      colname <- default_val(input$var_name, var_name_ph_util)
-      rlang::call2( quote(dplyr::mutate),
-        !!colname := rlang::call2(quote(dplyr::case_when),!!!moduleExpr())
-      )
-    })
-
+    # # construct a call based on inputs (again) & return to parent module
+    # expr_call <-reactive({
+    #   req(moduleExpr())
+    #   colname <- default_val(input$var_name, var_name_ph_util)
+    #   rlang::call2( quote(dplyr::mutate),
+    #     !!colname := rlang::call2(quote(dplyr::case_when),!!!moduleExpr())
+    #   )
+    # })
+    #
     # Not sure why, but when this is commented out, the cond UI will not display
     observe({
-      req(expr_call())
-      force(expr_call())
-    })
+      req(moduleExpr())
+      force(moduleExpr())
 
-    return(current_mutate = expr_call())
+      # req(expr_call())
+      # force(expr_call())
+    })
+    #
+    # return(current_mutate = expr_call())
   })
 }
