@@ -132,6 +132,7 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
 
     # calculate row counts
     newCol_n <- reactive({
+      req(mutated_dat())
       mutated_dat() %>%
         dplyr::group_by(newCol) %>%
         dplyr::summarize(cnts = dplyr::n())
@@ -146,6 +147,7 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
     # if 'else' group is created, answer should be 100% coverage
     row_cov_n <- reactive({
       req(newCol_n())
+      purrr::walk2(low(), high(), ~ req(input[[.x]], input[[.y]]))
       newCol_n() %>%
         dplyr::filter(newCol != 'NA') %>%
         dplyr::pull(cnts) %>%
@@ -162,7 +164,7 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
 
     # temporary output... just a place holder until we find a better way of displaying
     output$row_coverage_msg <- renderUI({
-      req(row_cov_pct(), else_group())
+      req(row_cov_pct()) #, exists(else_group")
       if(row_cov_pct() < 100 & else_group() == FALSE){
         HTML(glue::glue("Accounted for {row_cov_n()}/{nrow(dat())} patients ({row_cov_pct()}%) with ranges provided. Consider adding 'Else' Group."))
       }
