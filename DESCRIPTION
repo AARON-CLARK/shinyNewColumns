@@ -1,7 +1,7 @@
 Package: shinyNewColumns
 Type: Package
 Title: shinyNewColumns: a shiny module to derive custom columns in R data.frames on the fly
-Version: 0.0.5
+Version: 0.0.6
 Author: Aaron Clark
 Description: The shinyNewColumns module is simply a action button titled 'Create New Column' that can be placed anywhere in an existing shiny application. Upon clicking, a modal containing a user-friendly interface will launch & allow the user to build a new column off an existing data source. Specifically, the user will be able to select a new column type, name, label, and reference column(s) during deriviation. Along the way, the module helps the user visiualize existing column's distribution and summaries. Upon completion, the module returns the supplied data frame with the new column appended, and optional the dplyr::mutate() expressions used to create said column.
 License: MIT + file LICENSE
