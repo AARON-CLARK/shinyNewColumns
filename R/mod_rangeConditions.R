@@ -16,7 +16,7 @@ mod_rangeConditions_ui <- function(id) {
     uiOutput(ns("casewhens")),
     div(style = "float: right;", "Note: bounds are inclusive but executed in order shown."),
     div(style = "float: left; color: red", htmlOutput(ns("row_coverage_msg")))
-    # fluidRow(column(4, DT::dataTableOutput(ns("preview_newCol")) ))
+    # ,fluidRow(column(4, DT::dataTableOutput(ns("preview_newCol")) ))
   )
 }
 
