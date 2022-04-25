@@ -89,9 +89,17 @@ mod_newCol_srv <- function(id, dat, colType) {
     output$var_hist <- renderPlot({
       req(input$reference_var, dat())
 
-      ggplot2::ggplot(dat(), ggplot2::aes_string(x = input$reference_var)) +
-        ggplot2::geom_histogram(bins = 30) +
-        ggplot2::xlab(glue::glue("n = {nrow(dat())}"))
+      if(dat()[,input$reference_var] %>% is.numeric()) {
+        p <- ggplot2::ggplot(dat(), ggplot2::aes_string(x = input$reference_var)) +
+          ggplot2::geom_histogram(bins = 30)
+      } else {
+        p <- ggplot2::ggplot(dat(), ggplot2::aes_string(
+          x = input$reference_var, fill = input$reference_var)) +
+          ggplot2::geom_bar() +
+          ggplot2::scale_fill_hue(c = 40)
+      }
+
+      p + ggplot2::xlab(glue::glue("{input$reference_var}, n = {nrow(dat())}"))
 
     }, height=200)
 
