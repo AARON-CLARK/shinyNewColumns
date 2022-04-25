@@ -30,7 +30,7 @@ mod_rangeConditions_ui <- function(id) {
 #' @importFrom purrr map map2 reduce pmap
 #' @importFrom rlang call2 expr
 #' @importFrom glue glue
-#' @importFrom dplyr between mutate case_when group_by summarize select
+#' @importFrom dplyr between mutate case_when group_by summarize select filter pull
 #'
 mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, else_name) {
   moduleServer(id, function(input, output, session) {
@@ -81,7 +81,8 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
       column(1, purrr::map(high(), ~ numericInput(ns(.x), NULL, value = isolate(input[[.x]]) %||% max(ref_vtr(), na.rm = T), step = resp_step()) )),
       column(2, purrr::map(high(), ~ tags$div(class = "add_padding", "the value will be"))),
       column(2, purrr::map2(then_names(), grp_placeholders(), ~  textInput(ns(.x), NULL, value = isolate(input[[.x]]), placeholder = .y) )),
-      column(1, purrr::map2(then_names(),  grp_placeholders(), ~ tags$div(class = "add_padding red", glue::glue("{newCol_n()$cnts[newCol_n()$newCol == default_val(isolate(input[[.x]]), .y)]}/{nrow(dat())}"))))
+      column(1, purrr::map2(then_names(),  grp_placeholders(), ~ tags$div(class = "add_padding red",
+        glue::glue("{newCol_n()$cnts[newCol_n()$newCol == default_val(isolate(input[[.x]]), .y)]}/{nrow(dat())}"))))
     )
   })
 
@@ -144,16 +145,20 @@ mod_rangeConditions_srv <- function(id, dat, grp, reference_var, else_group, els
     # Determine how many rows have been accounted for.
     # if 'else' group is created, answer should be 100% coverage
     row_cov_n <- reactive({
-      req(ref_vtr())
-      sum(purrr::map2_int(low(), high(), function(.x, .y) {
-            req(input[[.x]], input[[.y]])
-            sum(dplyr::between(ref_vtr(),input[[.x]], input[[.y]]), na.rm = T)
-      }))
+      req(newCol_n())
+      newCol_n() %>%
+        dplyr::filter(newCol != 'NA') %>%
+        dplyr::pull(cnts) %>%
+        sum()
     })
     row_cov_pct <- reactive({
       req(row_cov_n(), dat())
       round(100 * (row_cov_n() / nrow(dat())), 2)
       })
+
+
+
+
 
     # temporary output... just a place holder until we find a better way of displaying
     output$row_coverage_msg <- renderUI({
