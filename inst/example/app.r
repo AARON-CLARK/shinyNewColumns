@@ -10,6 +10,8 @@ options(shiny.fullstacktrace = FALSE)
 ui <- fluidPage(
   includeCSS("www/style.css"),
   title = "shinyNewColumns",
+  a(img(src="github.png", style="float:right; height:65px; padding-top:5px;"),
+    href = "https://bit.ly/snc_new_issue"),
   h1(div(img(src="shinyNewColumnsv7_flat_wYellowStars.png",
              style=" padding-left:3px; height:100px;"),
          "shinyNewColumns"), align = "center"),
